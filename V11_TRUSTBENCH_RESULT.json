@@ -1,0 +1,136 @@
+{
+  "schema": "hodgeform-trustbench-result/0.1",
+  "authorityObligationExact": 10,
+  "authorityObligationTotal": 10,
+  "authorityObligationAccuracy": 1,
+  "evidenceAdmissibilityExact": 4,
+  "evidenceAdmissibilityTotal": 4,
+  "evidenceAdmissibilityAccuracy": 1,
+  "rows": [
+    {
+      "id": "TB-001-safe-no-authority-change",
+      "pass": true,
+      "added": [],
+      "semanticRequirementIds": [],
+      "risk": "medium"
+    },
+    {
+      "id": "TB-002-filesystem-write",
+      "pass": true,
+      "added": [
+        "filesystem.write"
+      ],
+      "semanticRequirementIds": [
+        "HF-FS-001",
+        "HF-FS-002"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "TB-003-payment-authority",
+      "pass": true,
+      "added": [
+        "payment.execute"
+      ],
+      "semanticRequirementIds": [
+        "HF-PAY-001"
+      ],
+      "risk": "critical"
+    },
+    {
+      "id": "TB-004-database-write",
+      "pass": true,
+      "added": [
+        "database.write"
+      ],
+      "semanticRequirementIds": [
+        "HF-DB-001"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "TB-005-shell-execution",
+      "pass": true,
+      "added": [
+        "shell.execute"
+      ],
+      "semanticRequirementIds": [
+        "HF-CODE-001"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "TB-006-email-side-effect",
+      "pass": true,
+      "added": [
+        "external_action.email"
+      ],
+      "semanticRequirementIds": [
+        "HF-ACT-002"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "TB-007-phi",
+      "pass": true,
+      "added": [
+        "data.phi"
+      ],
+      "semanticRequirementIds": [
+        "HF-DATA-002"
+      ],
+      "risk": "critical"
+    },
+    {
+      "id": "TB-008-secret-access",
+      "pass": true,
+      "added": [
+        "secrets.read"
+      ],
+      "semanticRequirementIds": [
+        "HF-SEC-001"
+      ],
+      "risk": "critical"
+    },
+    {
+      "id": "TB-009-network-authority",
+      "pass": true,
+      "added": [
+        "network.outbound"
+      ],
+      "semanticRequirementIds": [
+        "HF-NET-001"
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "TB-010-removal-does-not-invent-proof",
+      "pass": true,
+      "added": [],
+      "semanticRequirementIds": [],
+      "risk": "medium"
+    }
+  ],
+  "evidenceChecks": [
+    {
+      "id": "llm-pass-is-not-authority",
+      "expected": "missing",
+      "actual": "missing"
+    },
+    {
+      "id": "llm-counterexample-blocks",
+      "expected": "fail",
+      "actual": "fail"
+    },
+    {
+      "id": "same-team-cannot-satisfy-independent",
+      "expected": "missing",
+      "actual": "missing"
+    },
+    {
+      "id": "independent-deterministic-pass",
+      "expected": "pass",
+      "actual": "pass"
+    }
+  ]
+}

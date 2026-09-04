@@ -1,0 +1,70 @@
+name: release-gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: hodgeform_test
+          POSTGRES_USER: hodgeform
+          POSTGRES_PASSWORD: hodgeform-test-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hodgeform -d hodgeform_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://hodgeform:hodgeform-test-password@127.0.0.1:5432/hodgeform_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: node scripts/security-static-scan.mjs
+      - run: npm run brand:check
+      - run: npm run release:check
+      - run: python -m py_compile executor/server.py
+      - run: npm run db:migrate
+      - name: Real Postgres + HTTP tenant/API integration
+        run: node scripts/postgres-http-integration.mjs
+      - name: Auth lifecycle HTTP integration
+        run: node scripts/auth-http-integration.mjs
+      - name: Readiness fails closed on Postgres connection loss
+        run: node scripts/db-loss-readiness.mjs
+      - name: Install PostgreSQL client for backup/restore smoke
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client
+      - name: Backup and restore into a fresh Postgres database
+        run: ./scripts/postgres-backup-restore-smoke.sh
+      - name: Validate production Compose
+        env:
+          HODGEFORM_DOMAIN: hodgeform.example.test
+          POSTGRES_PASSWORD: compose-test-password
+          BETTER_AUTH_SECRET: compose-test-auth-secret-012345678901234567890123456
+          HODGEFORM_RECEIPT_PRIVATE_KEY_B64: test
+          HODGEFORM_RECEIPT_PUBLIC_KEY_B64: test
+          HODGEFORM_SANDBOX_TOKEN: compose-test-sandbox-token-0123456789
+          HODGEFORM_LEGAL_ENTITY_NAME: HodgeForm Test
+          HODGEFORM_LEGAL_EFFECTIVE_DATE: 2026-09-03
+          HODGEFORM_SUPPORT_EMAIL: support@example.test
+          HODGEFORM_SECURITY_EMAIL: security@example.test
+          HODGEFORM_PRIVACY_EMAIL: privacy@example.test
+          HODGEFORM_LEGAL_REVIEWED: 'true'
+        run: docker compose -f docker-compose.production.yml config >/dev/null
+      - name: Build production image
+        run: docker build -t hodgeform:${{ github.sha }} .
+      - name: Executor no-network/auth/resource smoke
+        run: ./scripts/executor-container-smoke.sh hodgeform-executor:${{ github.sha }}

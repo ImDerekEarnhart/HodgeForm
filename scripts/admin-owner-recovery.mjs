@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+import pg from "pg";
+const databaseUrl=process.env.DATABASE_URL;if(!databaseUrl)throw new Error("DATABASE_URL is required");
+const [workspaceId,userId]=process.argv.slice(2);if(!workspaceId||!userId)throw new Error("usage: admin-owner-recovery.mjs <workspace-id> <existing-user-id>");
+if(process.env.HODGEFORM_BREAK_GLASS_CONFIRM!==`TRANSFER_OWNER:${workspaceId}:${userId}`)throw new Error("Exact HODGEFORM_BREAK_GLASS_CONFIRM is required");
+const pool=new pg.Pool({connectionString:databaseUrl});
+try{const client=await pool.connect();try{await client.query("BEGIN");const w=await client.query(`select id from workspaces where id=$1 for update`,[workspaceId]);if(!w.rowCount)throw new Error("workspace not found");const u=await client.query(`select id,"emailVerified" from "user" where id=$1`,[userId]);if(!u.rowCount||u.rows[0].emailVerified!==true)throw new Error("target must be an existing verified user");await client.query(`insert into workspace_members(workspace_id,user_id,role) values($1,$2,'owner') on conflict(workspace_id,user_id) do update set role='owner'`,[workspaceId,userId]);await client.query(`insert into user_workspace_preferences(user_id,workspace_id) values($1,$2) on conflict(user_id) do update set workspace_id=excluded.workspace_id,updated_at=now()`,[userId,workspaceId]);await client.query("COMMIT");console.log(JSON.stringify({status:"owner_transferred",workspaceId,userId}));}catch(e){await client.query("ROLLBACK");throw e}finally{client.release()}}finally{await pool.end()}

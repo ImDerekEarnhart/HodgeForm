@@ -1,0 +1,33 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    # Uncomment on a host with NVIDIA Container Toolkit support.
+    # gpus: all
+
+  executor:
+    build: ./executor
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    cap_drop: ["ALL"]
+    cap_add: ["SETUID", "SETGID"]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 0.5
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=64m
+    environment:
+      HODGEFORM_SANDBOX_SOCKET: /runtime/sandbox/sandbox.sock
+    volumes:
+      - sandbox-socket:/runtime/sandbox
+
+volumes:
+  ollama-data:
+  sandbox-socket:

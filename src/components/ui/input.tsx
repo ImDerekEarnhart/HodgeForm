@@ -1,0 +1,5 @@
+import type { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) { return <input className={cn("h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-fg outline-none placeholder:text-subtle focus:border-border-strong", className)} {...props} />; }
+export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) { return <textarea className={cn("min-h-24 w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm text-fg outline-none placeholder:text-subtle focus:border-border-strong", className)} {...props} />; }
+export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) { return <select className={cn("h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-fg outline-none focus:border-border-strong", className)} {...props} />; }

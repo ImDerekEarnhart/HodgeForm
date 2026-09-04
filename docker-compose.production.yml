@@ -1,0 +1,115 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    environment:
+      HODGEFORM_DOMAIN: ${HODGEFORM_DOMAIN:?set HODGEFORM_DOMAIN}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [frontend]
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hodgeform
+      POSTGRES_USER: hodgeform
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hodgeform -d hodgeform"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HODGEFORM_PUBLIC_RELEASE: "true"
+      VITE_AUTH_ENABLED: "true"
+      HODGEFORM_EMAIL_PASSWORD_AUTH: "true"
+      HODGEFORM_ALLOW_SIGNUPS: ${HODGEFORM_ALLOW_SIGNUPS:-true}
+      HODGEFORM_EMAIL_PROVIDER: ${HODGEFORM_EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      HODGEFORM_EMAIL_FROM: ${HODGEFORM_EMAIL_FROM:-}
+      BETTER_AUTH_URL: https://${HODGEFORM_DOMAIN:?set HODGEFORM_DOMAIN}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET}
+      DATABASE_URL: postgresql://hodgeform:${POSTGRES_PASSWORD}@postgres:5432/hodgeform
+      HODGEFORM_DEPLOYMENT_MODE: ${HODGEFORM_DEPLOYMENT_MODE:-saas}
+      HODGEFORM_PRIVATE_TENANT_ID: ${HODGEFORM_PRIVATE_TENANT_ID:-}
+      HODGEFORM_RECEIPT_PRIVATE_KEY_B64: ${HODGEFORM_RECEIPT_PRIVATE_KEY_B64:?set receipt private key}
+      HODGEFORM_RECEIPT_PUBLIC_KEY_B64: ${HODGEFORM_RECEIPT_PUBLIC_KEY_B64:?set receipt public key}
+      HODGEFORM_SIGNER_ID: ${HODGEFORM_SIGNER_ID:-hodgeform-release-authority}
+      HODGEFORM_REQUIRED_POLICY_PACKS: ${HODGEFORM_REQUIRED_POLICY_PACKS:-}
+      HODGEFORM_REQUIRE_SEPARATE_APPROVER: ${HODGEFORM_REQUIRE_SEPARATE_APPROVER:-false}
+      HODGEFORM_MODEL_BASE_URL: http://ollama:11434/v1
+      HODGEFORM_STUDENT_MODEL: ${HODGEFORM_STUDENT_MODEL:-qwen3:8b}
+      HODGEFORM_TEACHER_MODEL: ${HODGEFORM_TEACHER_MODEL:-qwen3:14b}
+      HODGEFORM_ALLOW_XAI_FALLBACK: "false"
+      HODGEFORM_SANDBOX_SOCKET: /runtime/sandbox/sandbox.sock
+      HODGEFORM_SANDBOX_TOKEN: ${HODGEFORM_SANDBOX_TOKEN:?set a random sandbox service token}
+      HODGEFORM_LEGAL_ENTITY_NAME: ${HODGEFORM_LEGAL_ENTITY_NAME:?set legal entity name}
+      HODGEFORM_LEGAL_EFFECTIVE_DATE: ${HODGEFORM_LEGAL_EFFECTIVE_DATE:?set legal effective date}
+      HODGEFORM_SUPPORT_EMAIL: ${HODGEFORM_SUPPORT_EMAIL:?set support email}
+      HODGEFORM_SECURITY_EMAIL: ${HODGEFORM_SECURITY_EMAIL:?set security email}
+      HODGEFORM_PRIVACY_EMAIL: ${HODGEFORM_PRIVACY_EMAIL:?set privacy email}
+      HODGEFORM_DATA_RETENTION_DAYS: ${HODGEFORM_DATA_RETENTION_DAYS:-30}
+      HODGEFORM_LEGAL_REVIEWED: ${HODGEFORM_LEGAL_REVIEWED:?set true only after qualified legal review}
+    volumes: ["sandbox-socket:/runtime/sandbox"]
+    networks: [frontend, backend]
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+  executor:
+    profiles: ["sandbox"]
+    build: ./executor
+    restart: unless-stopped
+    network_mode: none
+    environment:
+      HODGEFORM_SANDBOX_SOCKET: /runtime/sandbox/sandbox.sock
+      HODGEFORM_SANDBOX_TOKEN: ${HODGEFORM_SANDBOX_TOKEN:?set a random sandbox service token}
+      HODGEFORM_LEGAL_ENTITY_NAME: ${HODGEFORM_LEGAL_ENTITY_NAME:?set legal entity name}
+      HODGEFORM_LEGAL_EFFECTIVE_DATE: ${HODGEFORM_LEGAL_EFFECTIVE_DATE:?set legal effective date}
+      HODGEFORM_SUPPORT_EMAIL: ${HODGEFORM_SUPPORT_EMAIL:?set support email}
+      HODGEFORM_SECURITY_EMAIL: ${HODGEFORM_SECURITY_EMAIL:?set security email}
+      HODGEFORM_PRIVACY_EMAIL: ${HODGEFORM_PRIVACY_EMAIL:?set privacy email}
+      HODGEFORM_DATA_RETENTION_DAYS: ${HODGEFORM_DATA_RETENTION_DAYS:-30}
+      HODGEFORM_LEGAL_REVIEWED: ${HODGEFORM_LEGAL_REVIEWED:?set true only after qualified legal review}
+    volumes: ["sandbox-socket:/runtime/sandbox"]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    cap_add: ["SETUID", "SETGID"]
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 0.5
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes: ["ollama-data:/root/.ollama"]
+    networks: [backend]
+    profiles: ["local-models"]
+
+networks:
+  frontend: {}
+  backend: { internal: true }
+volumes:
+  postgres-data: {}
+  ollama-data: {}
+  sandbox-socket: {}
+  caddy-data: {}
+  caddy-config: {}

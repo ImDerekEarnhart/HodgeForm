@@ -1,0 +1,96 @@
+{
+  "schema": "hodgeform-trustbench/0.1",
+  "description": "Open, deterministic fixtures for authority-delta to proof-obligation compilation and evidence admissibility.",
+  "cases": [
+    {
+      "id": "TB-001-safe-no-authority-change",
+      "previousCapabilities": ["network.outbound"],
+      "capabilities": ["network.outbound"],
+      "intent": {"pack": "networked", "dataClass": "internal"},
+      "expectedAddedCapabilities": [],
+      "expectedSemanticRequirementIds": [],
+      "expectedRisk": "medium"
+    },
+    {
+      "id": "TB-002-filesystem-write",
+      "previousCapabilities": ["filesystem.read"],
+      "capabilities": ["filesystem.read", "filesystem.write"],
+      "intent": {"pack": "code-execution", "dataClass": "internal"},
+      "expectedAddedCapabilities": ["filesystem.write"],
+      "expectedSemanticRequirementIds": ["HF-FS-001", "HF-FS-002"],
+      "expectedRisk": "high"
+    },
+    {
+      "id": "TB-003-payment-authority",
+      "previousCapabilities": ["network.outbound"],
+      "capabilities": ["network.outbound", "payment.execute"],
+      "intent": {"pack": "high-risk", "dataClass": "confidential"},
+      "expectedAddedCapabilities": ["payment.execute"],
+      "expectedSemanticRequirementIds": ["HF-PAY-001"],
+      "expectedRisk": "critical"
+    },
+    {
+      "id": "TB-004-database-write",
+      "previousCapabilities": ["database.read"],
+      "capabilities": ["database.read", "database.write"],
+      "intent": {"pack": "action-taking", "dataClass": "internal"},
+      "expectedAddedCapabilities": ["database.write"],
+      "expectedSemanticRequirementIds": ["HF-DB-001"],
+      "expectedRisk": "high"
+    },
+    {
+      "id": "TB-005-shell-execution",
+      "previousCapabilities": [],
+      "capabilities": ["shell.execute"],
+      "intent": {"pack": "code-execution", "dataClass": "internal"},
+      "expectedAddedCapabilities": ["shell.execute"],
+      "expectedSemanticRequirementIds": ["HF-CODE-001"],
+      "expectedRisk": "high"
+    },
+    {
+      "id": "TB-006-email-side-effect",
+      "previousCapabilities": ["network.outbound"],
+      "capabilities": ["network.outbound", "external_action.email"],
+      "intent": {"pack": "action-taking", "dataClass": "internal"},
+      "expectedAddedCapabilities": ["external_action.email"],
+      "expectedSemanticRequirementIds": ["HF-ACT-002"],
+      "expectedRisk": "high"
+    },
+    {
+      "id": "TB-007-phi",
+      "previousCapabilities": ["data.pii"],
+      "capabilities": ["data.pii", "data.phi"],
+      "intent": {"pack": "high-risk", "dataClass": "regulated"},
+      "expectedAddedCapabilities": ["data.phi"],
+      "expectedSemanticRequirementIds": ["HF-DATA-002"],
+      "expectedRisk": "critical"
+    },
+    {
+      "id": "TB-008-secret-access",
+      "previousCapabilities": [],
+      "capabilities": ["secrets.read"],
+      "intent": {"pack": "high-risk", "dataClass": "confidential"},
+      "expectedAddedCapabilities": ["secrets.read"],
+      "expectedSemanticRequirementIds": ["HF-SEC-001"],
+      "expectedRisk": "critical"
+    },
+    {
+      "id": "TB-009-network-authority",
+      "previousCapabilities": [],
+      "capabilities": ["network.outbound"],
+      "intent": {"pack": "networked", "dataClass": "internal"},
+      "expectedAddedCapabilities": ["network.outbound"],
+      "expectedSemanticRequirementIds": ["HF-NET-001"],
+      "expectedRisk": "medium"
+    },
+    {
+      "id": "TB-010-removal-does-not-invent-proof",
+      "previousCapabilities": ["network.outbound", "filesystem.write"],
+      "capabilities": ["network.outbound"],
+      "intent": {"pack": "networked", "dataClass": "internal"},
+      "expectedAddedCapabilities": [],
+      "expectedSemanticRequirementIds": [],
+      "expectedRisk": "medium"
+    }
+  ]
+}
