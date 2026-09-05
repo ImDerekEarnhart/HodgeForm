@@ -132,7 +132,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 986f2e3e40fc4f7bd75be848693212c0d6bd8560f89c32975cffc87bf21e15d6  ./tests/onboarding.test.mjs
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
-58c7c5d83329bbf9999e270ad208a474bd417efb943c40c759272d11e1a3decc  ./tests/product-surface.test.mjs
+ddb094dc38a90ad81f9f56baeb8169c57e7074dc816be32cebf7768a0d5eb23e  ./tests/product-surface.test.mjs
 e0ac0537db6ae5467d0ad9f9e3162c046710b0efb24d199790f05447ca6b0fe3  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs

@@ -61,7 +61,8 @@ test("platform-builder preview/runtime baggage is not part of the production pro
   const pkg = JSON.parse(await text("package.json"));
   assert.equal(pkg.name, "hodgeform");
   assert.ok(pkg.bin?.hodgeform);
-  assert.equal(pkg.scripts?.["release:check"], "npm run typecheck && npm run lint && npm test && npm run trust:check && npm run brand:check && npm run build");
+  assert.equal(pkg.scripts?.["manifest:check"], "node scripts/verify-source-manifest.mjs");
+  assert.equal(pkg.scripts?.["release:check"], "npm run typecheck && npm run lint && npm run manifest:check && npm test && npm run trust:check && npm run brand:check && npm run build");
   await assert.rejects(() => readFile(join(root, "scripts/grok-pwa-plugin.mjs")));
   await assert.rejects(() => readFile(join(root, ".grok/app-env.json")));
 });
