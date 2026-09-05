@@ -47,10 +47,16 @@ jobs:
         run: node scripts/auth-http-integration.mjs
       - name: Readiness fails closed on Postgres connection loss
         run: node scripts/db-loss-readiness.mjs
-      - name: Install PostgreSQL client for backup/restore smoke
-        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client-17
       - name: Backup and restore into a fresh Postgres database
-        run: ./scripts/postgres-backup-restore-smoke.sh
+        run: |
+          docker run --rm --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e GITHUB_RUN_ID="$GITHUB_RUN_ID" \
+            -e GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" \
+            -v "$GITHUB_WORKSPACE:/workspace:ro" \
+            -w /workspace \
+            postgres:17-alpine \
+            sh ./scripts/postgres-backup-restore-smoke.sh
       - name: Validate production Compose
         env:
           HODGEFORM_DOMAIN: hodgeform.example.test
