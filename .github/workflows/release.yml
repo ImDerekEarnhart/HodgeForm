@@ -48,7 +48,7 @@ jobs:
       - name: Readiness fails closed on Postgres connection loss
         run: node scripts/db-loss-readiness.mjs
       - name: Install PostgreSQL client for backup/restore smoke
-        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client-17
       - name: Backup and restore into a fresh Postgres database
         run: ./scripts/postgres-backup-restore-smoke.sh
       - name: Validate production Compose
