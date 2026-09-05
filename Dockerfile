@@ -18,6 +18,7 @@ RUN apk upgrade --no-cache \
 COPY --chown=hodgeform:hodgeform --from=build /app/.output ./.output
 COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migration-plan.mjs ./scripts/migration-plan.mjs
+COPY --chown=hodgeform:hodgeform --from=build /app/scripts/provision-operator.mjs ./scripts/provision-operator.mjs
 COPY --chown=hodgeform:hodgeform --from=build /app/migrations ./migrations
 COPY --chown=hodgeform:hodgeform --from=build /app/node_modules ./node_modules
 USER hodgeform

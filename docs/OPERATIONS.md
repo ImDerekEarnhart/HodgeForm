@@ -61,3 +61,23 @@ Application rollback should normally roll back the image while leaving forward-c
 ## Backups and retention
 
 Set explicit retention for database backups, logs, exported receipts and customer artifacts. Signed release receipts and audit records should be treated as long-lived records unless a customer contract/legal requirement specifies otherwise. Do not store model prompts or private source artifacts unless the product feature explicitly requires it.
+
+## Railway application service
+
+The source-controlled `railway.json` builds the unprivileged Docker image, runs
+migrations as a separate pre-deploy step, starts the application without repeating
+migrations, and checks `/api/ready` before routing traffic. Start with one replica;
+both authentication and agent burst limits are currently process-local. Configure
+trusted edge rate limiting before public signup or horizontal scaling.
+
+The runtime image includes `scripts/provision-operator.mjs`. Because package-manager
+executables are intentionally removed from the image, provision through a private
+operator session with `node scripts/provision-operator.mjs <email> <name>` and the
+password supplied through the platform secret environment. Remove the temporary
+provisioning secret after use. Never include the password in command arguments.
+
+Create a dedicated HodgeForm project with private PostgreSQL connectivity. Enable
+and verify database backups and a restore drill before accepting customer data.
+Set the service variables from `.env.production.example` together with DATABASE_URL,
+BETTER_AUTH_URL=https://hodgeform.com, and HODGEFORM_EMAIL_PASSWORD_AUTH=true.
+The example values are documentation, not launch-ready business identity or secrets.

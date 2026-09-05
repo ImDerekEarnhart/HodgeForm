@@ -6,6 +6,8 @@ import { publicPage } from "@/lib/ops/public-pages.server";
 
 function harden(response: Response, id?: string): Response {
   const headers = new Headers(response.headers);
+  // Dynamic SSR and API responses can contain session-specific tenant data.
+  headers.set("Cache-Control", "private, no-store");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

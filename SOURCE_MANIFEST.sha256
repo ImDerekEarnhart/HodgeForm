@@ -7,7 +7,7 @@ a634fb084857c49ac9da060373e6a3b6a7dadb88a788028ad1c915bb3abf9bcd  ./.github/work
 d5f90f76c5b68ce7be5ba077813f97e1983511b8c314764537345a538c1261f4  ./.prettierrc
 d7d34d958413cad9e411783850543206ccbe07c82a6c30cc3ef89ceba47c2e63  ./CHANGELOG.md
 6d3f83da7d138cf87ab3f148dc32c018ec8422b9db21abd885bb0dc2718a5782  ./Caddyfile
-f57bedc653a1dc22947e862d03deae549caa2e8ba0adc800893bed856c9a0025  ./Dockerfile
+b7ab3b31b4fd15f5a96622121e718d735ba8e170837f5ef8c0ab807166d0523d  ./Dockerfile
 0b7c111fac155d8ded543e5fa7f46e8adc4e625887b02c7ff884c6aea6f1d559  ./PRODUCT_CONSTITUTION.md
 11c09962592e354d230526bef595ef5324e98f7f36cf5ba0291a6851fda6d256  ./README.md
 2832f23e73449d45a44efd041497f909a3794eba69b68495e72c73c5ce5195f6  ./RELEASE_STATUS.md
@@ -22,7 +22,7 @@ c7e820c4ae1a23efef9cc12689a94d9b4963e64be98b53db57c276e62e626e73  ./docker-compo
 59f41ff2fac8daa6453b9f190457a64ab20b409ac118fb34089eca2b361e52cf  ./docs/DISCOVERY_MODEL.md
 8944a921ec124dbfedd8216b5ad71da8c5038b7d00fe5636492ad9c7d6aba161  ./docs/INCIDENT_RESPONSE.md
 5a5e732978b35f2b54062c69a58e0c5c0ca2c19516c64d834d771adcbc7481c6  ./docs/KEY_ROTATION.md
-99ceb62d369daa34fe62b668b5504f59e240b1b04c352650fd2fe01fc46fff28  ./docs/OPERATIONS.md
+3b0c1e5e927cb66706cc833842df87f908750d05430f08565c0bc19e4c4afff9  ./docs/OPERATIONS.md
 9eb3325e77208e1fadc0d4ee6160c2007aec147f3b6e07098cda3a723478328c  ./docs/POLICY_PACKS.md
 6f6e600846c45061b48391a925542bb3ac34bafc88fc3b484ab690a2dd63cee2  ./docs/PRODUCT_MANIFESTO.md
 f348eddd3ce1bc037d6f904a4d0998083f5775cc06f467da06f395943fd5147a  ./docs/QUICKSTART.md
@@ -45,6 +45,7 @@ b853cd8d9df20672a6253904525e7a383c77d35768caedb5f913e59a845f034e  ./package-lock
 fbc87acaa2380405e89e2cd713c135ce1877a3db8179efabc483762f0527e5f9  ./package.json
 c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favicon.svg
 923030a4cdded83b0cf57c832f0fc38f1b8edc0ab0f768b53efcf9c35b8bb3d4  ./public/og.jpg
+d077e141cbc5a50635acdf736dce905a6d53c15de9617e17d0f2f7f834c85c71  ./railway.json
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
 5073d39137ff9c1db25825e152ddacbeb79da7b542af7914827b1e1873163ca7  ./scripts/auth-http-integration.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
@@ -74,10 +75,12 @@ cdecf1fa8a1df9ee2cccc7fc1656ee1fa9e6fe2741d8d7bcaed4c1bcf35c8795  ./src/componen
 66a7c07c0acf216e91ca92c323e54f029a01e52b6ebb43c8d77513e539b9f6d2  ./src/lib/auth/email-password.ts
 7b2e86da4f26f54e3930388724693df3596288c6ccd1b8e254591a4e98448a92  ./src/lib/auth/email.server.ts
 d95752afbaad22a71b4dc574bf5a3654307f1ea8f03791818812fc35a44123ad  ./src/lib/auth/gates.tsx
-93135c55bb215652b11244084279865a65cd442746a0bb2b61d1384103750d44  ./src/lib/auth/isolation.server.ts
+70d30addc47e6e8be50964c7678b01caca622fc7836325a8ac83e3dfbfd02e93  ./src/lib/auth/isolation.server.ts
 338b545be0eaf0db5321a2dde107a5fd2351e0953e6e1eb254aa057d7a53ae3c  ./src/lib/auth/middleware.ts
 4ace59f2a87243de957c618d101501a7c18ecc78096b7ebf5a7a0564dac66c05  ./src/lib/auth/pglite-dialect.ts
-af94d597aca9029b6b0aeffb679a03d4573ed854c033f8e9658dcdf4f9c7042a  ./src/lib/auth/server.ts
+4f73d583b370d5dd77a90ffb9c2f4b9ae8842ce0dccd9235572bf1bb4f7277e2  ./src/lib/auth/request-provenance.ts
+c18fad65eea36e9fbdbfd2180cabfe4e15dd81825265898fadb52f9107281440  ./src/lib/auth/server.ts
+5bf8a524b265835d754bd36a506b7739fd67b267c07d8cd4c237568a7c26c2ec  ./src/lib/auth/trusted-origins.ts
 045f0379957e31cbf9800da45026cbee99414304239c61f2b8fe09deb7101446  ./src/lib/auth/use-current-user.ts
 837ffd4fa9956dc2b3f37db46da95b942dc30cc9ae0862d3f1314fa4b09f92d1  ./src/lib/auth/verify.server.ts
 dea5a7f596ba81218f3c7507495c6f3f6307dba34aff387dce518680c27e5dd4  ./src/lib/db.ts
@@ -98,7 +101,7 @@ e88447d2966ac958ee9d196e5b1ef67a53b18d056735c8dc24bb72572ed0e1ac  ./src/lib/ops/
 49225ff3e67ed46f3e5977d6a903f780009256a2b7e034a61579c690335164e1  ./src/lib/ops/readiness.server.ts
 5ddabbb42bd1d789bb48665233297960c130dc68a620dbc257d1930937a3e02a  ./src/lib/runtime/model-provider.server.ts
 aff81f5987445ecb5a6623424f6061fe8af7b8fd095ae9c1342fa3dff66e8ce3  ./src/lib/runtime/sandbox.server.ts
-4a6cc68322605aaf552ecb13f1051d3231c6c19abdd21f1e6e06cc8a0da0b1dd  ./src/lib/security/rate-limit.server.ts
+0e2a62c583553409563ebb1b9e463fdf2366c474b2b613441653bd3f983e95ef  ./src/lib/security/rate-limit.server.ts
 1ecf511f9d368431912ca9b8c7b6bf7c267cdadf49b5adddfa601143affe7d52  ./src/lib/use-async.ts
 5db9cf489cb1a89f1d0b2661804206c3dce28d4f1a2d11a77ad14d07e4ee8ea8  ./src/lib/utils.ts
 b81360008d83ffd7b2e16ff38dc6d8be6085da438a1f37ae3d604652cb1633b1  ./src/routeTree.gen.ts
@@ -122,7 +125,7 @@ b8ac0d3a29486200369fd15b8bd70bf945be90bc3b0685013bb8ab6390a39aaf  ./src/routes/r
 9f1e6b40a3d9454c4e6f6fd85faf126fb858093e6ccc84fed6974547cb11d576  ./src/routes/reset-password.tsx
 13272ed9cb784e9971e3d10ff73433d7944c813bd724d5a7c9d934c7ba0ea5ce  ./src/routes/verify.tsx
 f14aa05687e2ae0f710114e789bcdbb4af45428f7cd1845f760690852e9a282d  ./src/routes/workspace.tsx
-9a4e4089cd1434a07b536c621cc09e6bea4bfa5aaa5e8bd3dabc53dd46f9aecf  ./src/server.ts
+c71ca9fe3171dd5b9f10b6e53ad4ab7bd5a01940c252e0f0a2d4f54871c1de6a  ./src/server.ts
 476ea4c50cdee549f03232e63e0be624ba53cac23ce04d5204dd0cd0a8af5e5f  ./src/styles.css
 43783c9dd8f2112227d4f8158daaa7745c167b8cb8268c54f06753192f66607b  ./tests/auth-contract.test.mjs
 32c43b2d54d126068cc0789f6d6e23708a27f39e280dd1d6315cc1ca65d52697  ./tests/container-contract.test.mjs
@@ -133,6 +136,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 ddb094dc38a90ad81f9f56baeb8169c57e7074dc816be32cebf7768a0d5eb23e  ./tests/product-surface.test.mjs
+4bba28d2e6cd203362e964fd878fdd17e4925c381ebc6d54d85d14bbae6154f2  ./tests/public-hardening.test.mjs
 e0ac0537db6ae5467d0ad9f9e3162c046710b0efb24d199790f05447ca6b0fe3  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs
