@@ -31,7 +31,7 @@ try{
  r=await http("/api/auth/reset-password",{method:"POST",body:{newPassword,token}});assert.ok(r.res.status>=200&&r.res.status<300,`reset failed ${r.res.status}: ${r.text}`);
  r=await http("/api/auth/get-session",{cookie});assert.ok(!r.data?.user,"password reset must revoke the prior session");
  r=await http("/api/auth/sign-in/email",{method:"POST",body:{email,password}});assert.ok(r.res.status>=400,"old password must stop working");
- r=await http("/api/auth/sign-in/email",{method:"POST",body:{email,newPassword}});assert.ok(r.res.status>=200&&r.res.status<300,`new password must work (${r.res.status}): ${r.text}`);
+ r=await http("/api/auth/sign-in/email",{method:"POST",body:{email,password:newPassword}});assert.ok(r.res.status>=200&&r.res.status<300,`new password must work (${r.res.status}): ${r.text}`);
  let throttled=false;for(let i=0;i<12;i++){const x=await http("/api/auth/sign-in/email",{method:"POST",body:{email:`missing-${suffix}@example.test`,password:"definitely-wrong-password"}});if(x.res.status===429){throttled=true;break}}assert.equal(throttled,true,"repeated sign-in attempts must be throttled");
  console.log("auth HTTP integration: PASS");
 }finally{
