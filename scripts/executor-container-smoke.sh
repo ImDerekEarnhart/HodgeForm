@@ -23,7 +23,9 @@ for _ in $(seq 1 30); do
 done
 
 request() {
-  AUTH="$1" CODE="$2" docker run --rm --network none -v "$VOL:/runtime/sandbox" --entrypoint python3 "$IMAGE" -c '
+  AUTH="$1"
+  CODE="$2"
+  docker run --rm --network none -e AUTH="$AUTH" -e CODE="$CODE" -v "$VOL:/runtime/sandbox" --entrypoint python3 "$IMAGE" -c '
 import json, os, socket
 sock=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); sock.connect("/runtime/sandbox/sandbox.sock")
 body=json.dumps({"code":os.environ["CODE"]}).encode()

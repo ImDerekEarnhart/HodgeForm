@@ -46,7 +46,7 @@ c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favic
 5073d39137ff9c1db25825e152ddacbeb79da7b542af7914827b1e1873163ca7  ./scripts/auth-http-integration.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
 4e7b30816ee3e3e09060ab7cbc47c5b8ee5223fe3193d57e234e8d130de2b61f  ./scripts/db-loss-readiness.mjs
-a5634a451f4f567cbcc8d74a2f8e798c7e4ee760e9ba536e4224209b60a4711e  ./scripts/executor-container-smoke.sh
+6d47c17dba0edfbea75157b87045cf27ef45954f5eb3362b7a0b243421a58c63  ./scripts/executor-container-smoke.sh
 065766ce215a7db7693b7361dc8ecd9bbf6c1521cfb86421578023f408b6d3b5  ./scripts/golden-path-smoke.mjs
 6b7f59c08e8e212766cd1dbee3757b9e87988121e7f2a8faefd79c8e7a734668  ./scripts/migrate.mjs
 3f12b507b2d7c184296f4a142705e8ec2e263a9b5c531f061cb888de266c53e5  ./scripts/migration-plan.mjs
