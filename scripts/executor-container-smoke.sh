@@ -13,7 +13,7 @@ trap cleanup EXIT INT TERM
 docker build -t "$IMAGE" ./executor >/dev/null
 docker volume create "$VOL" >/dev/null
 docker run -d --name "$NAME" --network none --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-  --cap-drop ALL --cap-add SETUID --cap-add SETGID --pids-limit 64 --memory 256m --cpus .5 \
+  --cap-drop ALL --pids-limit 64 --memory 256m --cpus .5 \
   -e HODGEFORM_SANDBOX_SOCKET=/runtime/sandbox/sandbox.sock \
   -e HODGEFORM_SANDBOX_TOKEN="$TOKEN" -v "$VOL:/runtime/sandbox" "$IMAGE" >/dev/null
 

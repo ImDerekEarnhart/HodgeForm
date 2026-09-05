@@ -20,4 +20,6 @@ test("executor container contract keeps no-network and resource limits", () => {
   assert.match(compose, /cpus:\s*0\.5/);
   assert.match(smoke, /--network none/);
   assert.match(smoke, /401 Unauthorized/);
+  assert.match(smoke, /--cap-drop ALL/);
+  assert.doesNotMatch(smoke, /--cap-add SETUID|--cap-add SETGID/);
 });

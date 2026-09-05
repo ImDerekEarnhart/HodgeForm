@@ -85,7 +85,6 @@ services:
     tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
     security_opt: ["no-new-privileges:true"]
     cap_drop: ["ALL"]
-    cap_add: ["SETUID", "SETGID"]
     pids_limit: 64
     mem_limit: 256m
     cpus: 0.5

@@ -10,3 +10,4 @@ coverage
 .DS_Store
 
 .hodgeform/
+__pycache__/

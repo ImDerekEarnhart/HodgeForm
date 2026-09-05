@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Reference single-tenant Python verifier executor.
 
-The web process never executes submitted code. This service binds a Unix socket,
-drops root privileges, runs Python in a temporary directory with no inherited
+The web process never executes submitted code. This service runs as an unprivileged
+account, binds a Unix socket, and runs Python in a temporary directory with no inherited
 environment, strict rlimits, and a timeout. The production compose gives this
 container no network stack and a read-only root filesystem.
 
@@ -37,7 +37,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
 os.makedirs(os.path.dirname(SOCKET),exist_ok=True)
 try: os.unlink(SOCKET)
 except FileNotFoundError: pass
+if os.geteuid()!=UID or os.getegid()!=GID: raise RuntimeError("executor must run as the configured unprivileged sandbox user")
 server=UnixServer(SOCKET,Handler); os.chmod(SOCKET,0o666)
-# Bind as root, then permanently drop before handling requests/submitted code.
-os.setgroups([]); os.setgid(GID); os.setuid(UID)
 server.serve_forever()
