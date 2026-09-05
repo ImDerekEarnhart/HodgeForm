@@ -77,3 +77,12 @@ test("request body guard times out and cancels a stalled upload", async () => {
   await assert.rejects(boundedRequestBody(request, 20, 20), (error) => error instanceof RequestBodyError && error.status === 408);
   assert.equal(cancelled, true);
 });
+
+test("request body guard supports server-adapter requests without native branding", async () => {
+  const input = new Request("https://hodgeform.com/api/test", { method: "POST", body: '{"adapter":true}' });
+  const adapter = { url: input.url, method: input.method, headers: input.headers, body: input.body, signal: input.signal };
+  const result = await boundedRequestBody(adapter);
+  assert.deepEqual(await result.json(), { adapter: true });
+  assert.equal(result.method, "POST");
+  assert.equal(result.url, input.url);
+});

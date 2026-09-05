@@ -37,7 +37,8 @@ export async function boundedRequestBody(request: Request, maxBytes = 1_048_576,
     const headers = new Headers(request.headers);
     headers.delete("transfer-encoding");
     headers.set("content-length", String(total));
-    return new Request(request, { headers, body });
+    // Server adapters can expose Request-shaped objects without native Fetch internals.
+    return new Request(request.url, { method: request.method, headers, body, signal: request.signal });
   } finally {
     clearTimeout(timer);
     if (!completed) void reader.cancel().catch(() => undefined);

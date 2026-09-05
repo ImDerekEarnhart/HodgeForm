@@ -102,7 +102,7 @@ e88447d2966ac958ee9d196e5b1ef67a53b18d056735c8dc24bb72572ed0e1ac  ./src/lib/ops/
 5ddabbb42bd1d789bb48665233297960c130dc68a620dbc257d1930937a3e02a  ./src/lib/runtime/model-provider.server.ts
 aff81f5987445ecb5a6623424f6061fe8af7b8fd095ae9c1342fa3dff66e8ce3  ./src/lib/runtime/sandbox.server.ts
 0e2a62c583553409563ebb1b9e463fdf2366c474b2b613441653bd3f983e95ef  ./src/lib/security/rate-limit.server.ts
-e2dff721fe5224a307a003a5a1103f394fba99e7deec92801cd57c3c535eb91b  ./src/lib/security/request-body.ts
+3a0941259add701c508fe2bf9d241709e92216733943aa040c7af592682699dd  ./src/lib/security/request-body.ts
 1ecf511f9d368431912ca9b8c7b6bf7c267cdadf49b5adddfa601143affe7d52  ./src/lib/use-async.ts
 5db9cf489cb1a89f1d0b2661804206c3dce28d4f1a2d11a77ad14d07e4ee8ea8  ./src/lib/utils.ts
 b81360008d83ffd7b2e16ff38dc6d8be6085da438a1f37ae3d604652cb1633b1  ./src/routeTree.gen.ts
@@ -137,7 +137,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 ddb094dc38a90ad81f9f56baeb8169c57e7074dc816be32cebf7768a0d5eb23e  ./tests/product-surface.test.mjs
-6605e655ba83d6275752473a161dce2939145f4336970c759b3b041e17b7b107  ./tests/public-hardening.test.mjs
+fea0c61599ee817c44151cac7b43adc87529fcbddc3e521abf8fdf659d8d7a88  ./tests/public-hardening.test.mjs
 e0ac0537db6ae5467d0ad9f9e3162c046710b0efb24d199790f05447ca6b0fe3  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs
