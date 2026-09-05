@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { createHash, generateKeyPairSync, randomBytes, randomUUID } from "node:crypto";
+import { createHash, generateKeyPairSync, randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import pg from "pg";
@@ -53,7 +53,7 @@ async function cleanup() {
     await q(`delete from verifier_principals where id=$1`, [verifierId]);
     await q(`delete from workspaces where id = any($1::text[])`, [[ids.wa,ids.wb]]);
     await q(`delete from "user" where id = any($1::text[])`, [[ids.a,ids.b,ids.c]]);
-  } catch {}
+  } catch { /* Preserve the original test failure if best-effort cleanup cannot run. */ }
   await pool.end();
 }
 async function request(token, path, options = {}) {
@@ -64,7 +64,7 @@ async function request(token, path, options = {}) {
 }
 async function waitReady() {
   for (let i=0;i<100;i++) {
-    try { const r = await fetch(`${base}/api/ready`); if (r.status === 200) return; } catch {}
+    try { const r = await fetch(`${base}/api/ready`); if (r.status === 200) return; } catch { /* Retry while the application starts. */ }
     await sleep(100);
   }
   throw new Error("application did not become ready");

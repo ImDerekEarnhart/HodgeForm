@@ -43,9 +43,9 @@ c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favic
 11c09962592e354d230526bef595ef5324e98f7f36cf5ba0291a6851fda6d256  ./README.md
 31e30435f50f33493910f4451aadb9fbf52f81040e9cb8df22859e156f430efb  ./RELEASE_STATUS.md
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
-d58d79c75cc4ac06f0acfb488d0c4ba09b2f268522701060475ca3e572b43f22  ./scripts/auth-http-integration.mjs
-1c6bfba8faf0804a2f7236cdd0e23f52a3130c21d9592698ddf53230919769e3  ./scripts/brand-smoke.mjs
-ba6d85fc98893d02d23abc00a4c237da5d2b1582b4d326d54f71851a05497640  ./scripts/db-loss-readiness.mjs
+8a4308ae00aaac367489d8eefc9f186f1668c5a5d07ae6107e202fc7e9cee106  ./scripts/auth-http-integration.mjs
+2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
+e0447594d0f2ba8a63badc184d28202c97c970585f824e77ec9cd72f3a3a72b4  ./scripts/db-loss-readiness.mjs
 f3b41cd23d6d1232c1070140afded7f2557cf1614b02523d780cdc125673b702  ./scripts/executor-container-smoke.sh
 065766ce215a7db7693b7361dc8ecd9bbf6c1521cfb86421578023f408b6d3b5  ./scripts/golden-path-smoke.mjs
 6b7f59c08e8e212766cd1dbee3757b9e87988121e7f2a8faefd79c8e7a734668  ./scripts/migrate.mjs
@@ -54,7 +54,7 @@ bad7a7a7909c4ce6c4da4620c2bf4259445c3d28b5aa05a74ad7446e7d131ce2  ./scripts/migr
 b2c7b7db40d71897f12b1bf42424135d0f06e5d31ffff2c09ba52a9828764799  ./scripts/operator-provisioning-smoke.mjs
 aef4a44cf529998f3812e5149454b08ca19c5bc1e94f72d9abf030b822a01f0c  ./scripts/postgres-backup-restore-smoke.sh
 38806d4b60432d3d69693cfcd2e83f37c739e521b2baace9f1926a74a6ce3e01  ./scripts/postgres-backup.sh
-6510c150b287bb3d6df0803b3f235fcd0adc2958db82630bd21d2500cfb48ec1  ./scripts/postgres-http-integration.mjs
+63e06891630c4e02a1dbab8d812af6859a7920b1c1fbf1e606bd55ec7ea4465e  ./scripts/postgres-http-integration.mjs
 ffce0bdf88c6ce566f3db8fdda9f45ef7d1001c03735cf797198428fccd35694  ./scripts/postgres-restore.sh
 31eeea403d5ba67cd0fb59eb999b80ce2cd43fa86f290ec427fccb95d69c0975  ./scripts/provision-operator.mjs
 298b9f7b555af470e8e06c82b3261312b4b5e316c8652aec808c0c93f6f5d2a2  ./scripts/security-static-scan.mjs

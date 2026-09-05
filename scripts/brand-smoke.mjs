@@ -14,28 +14,23 @@ try {
     text("src/routes/__root.tsx"),
     text("src/routes/index.tsx"),
   ]);
-  /HodgeForm/.test(rootRoute) && /HodgeForm/.test(landing)
-    ? pass("brand-name", "HodgeForm is present in public metadata and landing")
-    : fail("brand-name", "HodgeForm missing from public metadata or landing");
-  /Trust compiler/i.test(rootRoute + landing)
-    ? pass("positioning", "trust-compiler positioning present")
-    : fail("positioning", "trust-compiler positioning missing");
-  /Verify a receipt/i.test(landing)
-    ? pass("receipt-cta", "public receipt verification CTA present")
-    : fail("receipt-cta", "public receipt verification CTA missing");
+  if (/HodgeForm/.test(rootRoute) && /HodgeForm/.test(landing)) pass("brand-name", "HodgeForm is present in public metadata and landing");
+  else fail("brand-name", "HodgeForm missing from public metadata or landing");
+  if (/Trust compiler/i.test(rootRoute + landing)) pass("positioning", "trust-compiler positioning present");
+  else fail("positioning", "trust-compiler positioning missing");
+  if (/Verify a receipt/i.test(landing)) pass("receipt-cta", "public receipt verification CTA present");
+  else fail("receipt-cta", "public receipt verification CTA missing");
   const publicSurface = rootRoute + "\n" + landing;
-  /Grok App Builder|og\.grok\.me|DIRECTOR/i.test(publicSurface)
-    ? fail("stale-platform-brand", "public HodgeForm surface contains stale platform branding")
-    : pass("stale-platform-brand", "no stale Grok/App Builder branding in public surface");
+  if (/Grok App Builder|og\.grok\.me|DIRECTOR/i.test(publicSurface)) fail("stale-platform-brand", "public HodgeForm surface contains stale platform branding");
+  else pass("stale-platform-brand", "no stale Grok/App Builder branding in public surface");
 } catch (err) {
   fail("public-source", String(err));
 }
 
 try {
   const og = await stat(resolve(root, "public/og.jpg"));
-  og.size > 0 && og.size <= 600 * 1024
-    ? pass("og-card", `public/og.jpg is ${og.size} bytes`)
-    : fail("og-card", `public/og.jpg is ${og.size} bytes; expected 1..614400`);
+  if (og.size > 0 && og.size <= 600 * 1024) pass("og-card", `public/og.jpg is ${og.size} bytes`);
+  else fail("og-card", `public/og.jpg is ${og.size} bytes; expected 1..614400`);
 } catch (err) {
   fail("og-card", `missing/unreadable public/og.jpg: ${err}`);
 }

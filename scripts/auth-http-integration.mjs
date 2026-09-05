@@ -14,8 +14,8 @@ const port=Number(process.env.HODGEFORM_AUTH_INTEGRATION_PORT||3312),base=`http:
 const dir=await mkdtemp(join(tmpdir(),"hf-auth-")),capture=join(dir,"email.jsonl");
 const pool=new pg.Pool({connectionString:databaseUrl}); let child;
 async function http(path,{method="GET",body,cookie}={}){const res=await fetch(`${base}${path}`,{method,redirect:"manual",headers:{...(body?{"content-type":"application/json"}:{}),...(cookie?{cookie}:{})},body:body?JSON.stringify(body):undefined});const text=await res.text();let data;try{data=JSON.parse(text)}catch{data=text}return{res,data,text};}
-async function waitReady(){for(let i=0;i<100;i++){try{if((await fetch(`${base}/api/health`)).status===200)return}catch{}await sleep(100)}throw new Error("auth test app did not start")}
-async function nextEmail(subject,after=0){for(let i=0;i<100;i++){try{const lines=(await readFile(capture,"utf8")).trim().split(/\n/).filter(Boolean).map(JSON.parse);const found=lines.slice(after).find(x=>x.subject===subject);if(found)return{mail:found,count:lines.length}}catch{}await sleep(50)}throw new Error(`email not captured: ${subject}`)}
+async function waitReady(){for(let i=0;i<100;i++){try{if((await fetch(`${base}/api/health`)).status===200)return}catch{/* Retry while the application starts. */}await sleep(100)}throw new Error("auth test app did not start")}
+async function nextEmail(subject,after=0){for(let i=0;i<100;i++){try{const lines=(await readFile(capture,"utf8")).trim().split(/\n/).filter(Boolean).map(JSON.parse);const found=lines.slice(after).find(x=>x.subject===subject);if(found)return{mail:found,count:lines.length}}catch{/* The capture file is not created until the first email. */}await sleep(50)}throw new Error(`email not captured: ${subject}`)}
 function firstUrl(text){const m=String(text).match(/https?:\/\/[^\s]+/);if(!m)throw new Error(`no URL in captured email: ${text}`);return m[0]}
 function cookieFrom(res){const raw=res.headers.get("set-cookie");if(!raw) return "";return raw.split(/,(?=[^;]+?=)/).map(x=>x.split(";",1)[0]).join("; ")}
 try{
@@ -36,6 +36,6 @@ try{
  console.log("auth HTTP integration: PASS");
 }finally{
  if(child){child.kill("SIGTERM");await Promise.race([new Promise(r=>child.once("exit",r)),sleep(1500)]);if(child.exitCode==null)child.kill("SIGKILL")}
- try{const u=await pool.query(`select id from "user" where email=$1`,[email]);if(u.rows[0])await pool.query(`delete from "user" where id=$1`,[u.rows[0].id])}catch{}
+ try{const u=await pool.query(`select id from "user" where email=$1`,[email]);if(u.rows[0])await pool.query(`delete from "user" where id=$1`,[u.rows[0].id])}catch{/* Preserve the original test failure if best-effort cleanup cannot run. */}
  await pool.end();await rm(dir,{recursive:true,force:true});
 }
