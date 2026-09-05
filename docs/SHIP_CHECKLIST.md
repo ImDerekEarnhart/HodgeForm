@@ -71,7 +71,7 @@ claim broad public GA, universal AI safety, legal certification, or customer tra
 
 - [x] **11. Freeze the distributable release**
   Scope: versioned commit/tag, regenerated source manifest, ZIP, and checksum.
-  Evidence: `v1.1.1-controlled-beta.1` is assigned to this release-record commit after its final clean workflow succeeds; its ZIP and SHA-256 are published with the private prerelease.
+  Evidence: `v1.1.1-controlled-beta.1` is assigned only after the final clean workflow succeeds; the source manifest is checked against canonical Git blob bytes to avoid Windows line-ending ambiguity, and its ZIP and SHA-256 are published with the private prerelease.
   Acceptance: customers and operators can identify the exact source used for the deployed beta.
   Verify: extract the prerelease ZIP into a fresh directory and compare `SOURCE_MANIFEST.sha256`.
 
