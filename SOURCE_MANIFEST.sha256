@@ -45,7 +45,7 @@ c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favic
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
 fc733a43e22a9fce1f499d153c88900d63a071ddeca5b1c09a576fce09c52433  ./scripts/auth-http-integration.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
-e0447594d0f2ba8a63badc184d28202c97c970585f824e77ec9cd72f3a3a72b4  ./scripts/db-loss-readiness.mjs
+4e7b30816ee3e3e09060ab7cbc47c5b8ee5223fe3193d57e234e8d130de2b61f  ./scripts/db-loss-readiness.mjs
 a5634a451f4f567cbcc8d74a2f8e798c7e4ee760e9ba536e4224209b60a4711e  ./scripts/executor-container-smoke.sh
 065766ce215a7db7693b7361dc8ecd9bbf6c1521cfb86421578023f408b6d3b5  ./scripts/golden-path-smoke.mjs
 6b7f59c08e8e212766cd1dbee3757b9e87988121e7f2a8faefd79c8e7a734668  ./scripts/migrate.mjs
