@@ -63,7 +63,7 @@ ffce0bdf88c6ce566f3db8fdda9f45ef7d1001c03735cf797198428fccd35694  ./scripts/post
 298b9f7b555af470e8e06c82b3261312b4b5e316c8652aec808c0c93f6f5d2a2  ./scripts/security-static-scan.mjs
 2ec14f44cbba1b080ac2729c0f9a3f1163bf03316492d14c0586542a176178aa  ./scripts/trust-boundary-demo.mjs
 99734aafdfc40ef877732a3be27981e157bf71ca27c774afd058731e991c0759  ./scripts/trustbench.mjs
-3bdd9f470f9904add53d752839144406220fff7e855e931f16333501134b83e8  ./scripts/verify-source-manifest.mjs
+9cfee6f727da41a41337c0059f5589426746bbab8cbccad40b2a76435cc5f80e  ./scripts/verify-source-manifest.mjs
 93ba8abd14935e49071d0fa63af328a0a06e8cd54d4c44f4410a536d2453cfd1  ./src/components/app-shell.tsx
 06baec99d70a348a0f531e2935b84bf03ff2309ec0aaf1beb8ffc3e4dc4cd1c6  ./src/components/developer-access.tsx
 cdecf1fa8a1df9ee2cccc7fc1656ee1fa9e6fe2741d8d7bcaed4c1bcf35c8795  ./src/components/page.tsx

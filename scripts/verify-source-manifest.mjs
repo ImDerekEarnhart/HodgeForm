@@ -41,7 +41,7 @@ const manifestText = await readFile(manifestPath, "utf8");
 const entries = new Map();
 for (const line of manifestText.split(/\r?\n/)) {
   if (!line) continue;
-  const match = /^([a-f0-9]{64})  \.\/(.+)$/.exec(line);
+  const match = /^([a-f0-9]{64}) {2}\.\/(.+)$/.exec(line);
   if (!match) throw new Error(`Malformed ${manifestPath} entry: ${line}`);
   const [, hash, file] = match;
   if (entries.has(file)) throw new Error(`Duplicate ${manifestPath} entry: ${file}`);
