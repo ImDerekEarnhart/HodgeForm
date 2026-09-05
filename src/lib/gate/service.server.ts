@@ -9,6 +9,7 @@ import { enforceAgentRateLimit } from "@/lib/security/rate-limit.server";
 import { teacherChat } from "@/lib/runtime/model-provider.server";
 import { deterministicAdversarialProposals } from "./falsifiers";
 import { resolveVerifierPrincipal } from "./verifiers.server";
+import { validateDiscoveryEvidence } from "./discovery-evidence";
 
 function id(prefix: string) { return `${prefix}_${randomUUID().replaceAll("-", "")}`; }
 function slugify(value: string) { return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "repo"; }
@@ -57,7 +58,7 @@ type ReceiptRow = {
 type ReceiptListRow = ReceiptRow & { version: string; artifact_hash: string; repository_name: string; repository_slug: string };
 type DiscoveryRow = {
   id: string; parent_id: string | null; branch: string; title: string; claim: string; status: string; content_hash: string;
-  evidence_refs_json: unknown; created_by: string; created_at: string; repository_name: string; repository_slug: string;
+  evidence_refs_json: unknown; created_by: string; created_at: string; repository_id: string; repository_name: string; repository_slug: string;
 };
 
 function jsonObject(value: unknown): Record<string, JsonValue> {
@@ -402,7 +403,8 @@ export async function createDiscovery(userId: string, input: { repositoryId: str
     const parent = await sql.query("select 1 from discovery_commits where tenant_id=$1 and repository_id=$2 and id=$3", [tenant, input.repositoryId, input.parentId]);
     if (!parent.length) throw new Error("Parent discovery commit not found");
   }
-  const payload = { parentId: input.parentId ?? null, branch: input.branch.trim().slice(0, 80) || "main", title: input.title.trim().slice(0, 160), claim: input.claim.trim().slice(0, 6000), evidenceRefs: (input.evidenceRefs ?? []).slice(0, 100) };
+  const evidenceRefs = await validateDiscoveryEvidence(sql, tenant, input.repositoryId, input.evidenceRefs ?? []);
+  const payload = { parentId: input.parentId ?? null, branch: input.branch.trim().slice(0, 80) || "main", title: input.title.trim().slice(0, 160), claim: input.claim.trim().slice(0, 6000), evidenceRefs };
   if (!payload.title || !payload.claim) throw new Error("Title and claim are required");
   const contentHash = sha256(payload); const commitId = id("disc");
   await sql.query(
@@ -416,7 +418,7 @@ export async function createDiscovery(userId: string, input: { repositoryId: str
 export async function listDiscoveries(userId: string) {
   const tenant = await tenantForUser(userId); const sql = await getSql();
   const rows = await sql.query<DiscoveryRow>(
-    `select d.id,d.parent_id,d.branch,d.title,d.claim,d.status,d.content_hash,d.evidence_refs_json,d.created_by,d.created_at,r.name as repository_name,r.slug as repository_slug
+    `select d.id,d.parent_id,d.branch,d.title,d.claim,d.status,d.content_hash,d.evidence_refs_json,d.created_by,d.created_at,d.repository_id,r.name as repository_name,r.slug as repository_slug
      from discovery_commits d join repositories r on r.id=d.repository_id where d.tenant_id=$1 order by d.created_at desc limit 300`, [tenant],
   );
   return rows.map((r) => ({ ...r, evidence_refs_json: asObject<string[]>(r.evidence_refs_json) }));

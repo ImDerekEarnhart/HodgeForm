@@ -15,10 +15,11 @@ b7ab3b31b4fd15f5a96622121e718d735ba8e170837f5ef8c0ab807166d0523d  ./Dockerfile
 421501ea8e7acb8f8edf9611a2d728517abaf8aeefa00c76ce65f1b91a8590e5  ./V11_TRUSTBENCH_RESULT.json
 ae3f45d98939d286148df0cc4b6f83d3dddff467a40d1362a73e338a692cb811  ./V11_TS_SYNTAX_AUDIT.json
 8f7046a70c3d7c5a0fc7b84d62706912e161feaad54e777ecdc8c9d99df52dd6  ./benchmarks/trustbench-v0.1.json
-d5f70677e99fa796ebb2c9b02bb148181895a044dff898a3b72a06d748bedd44  ./bin/hodgeform.mjs
+094ddda83882d086fb6e8e12e64fe2be43fe578c922ed4c22ed8e04de83712c8  ./bin/hodgeform.mjs
 ffb5a067dd12feafd01f785af654d608cea93718178e4c93871db92cf072e22a  ./docker-compose.local.yml
 c7e820c4ae1a23efef9cc12689a94d9b4963e64be98b53db57c276e62e626e73  ./docker-compose.production.yml
 14ddea6a93dcb0e56d38b825afd2ddd84f55167eb97d686416015784af4227a1  ./docs/DATA_RETENTION.md
+fbd952d7a2ca7a86ec97b05ff8085e253a4dd9bf5955499c08270f9f784e83a2  ./docs/DISCOVERY_GOVERNANCE.md
 59f41ff2fac8daa6453b9f190457a64ab20b409ac118fb34089eca2b361e52cf  ./docs/DISCOVERY_MODEL.md
 8944a921ec124dbfedd8216b5ad71da8c5038b7d00fe5636492ad9c7d6aba161  ./docs/INCIDENT_RESPONSE.md
 5a5e732978b35f2b54062c69a58e0c5c0ca2c19516c64d834d771adcbc7481c6  ./docs/KEY_ROTATION.md
@@ -78,6 +79,7 @@ d95752afbaad22a71b4dc574bf5a3654307f1ea8f03791818812fc35a44123ad  ./src/lib/auth
 70d30addc47e6e8be50964c7678b01caca622fc7836325a8ac83e3dfbfd02e93  ./src/lib/auth/isolation.server.ts
 338b545be0eaf0db5321a2dde107a5fd2351e0953e6e1eb254aa057d7a53ae3c  ./src/lib/auth/middleware.ts
 4ace59f2a87243de957c618d101501a7c18ecc78096b7ebf5a7a0564dac66c05  ./src/lib/auth/pglite-dialect.ts
+2ff260f5b38717a4a616e5b4f57bf1ca5ef0d43facffec041102cf4f3c881c4f  ./src/lib/auth/public-options.ts
 4f73d583b370d5dd77a90ffb9c2f4b9ae8842ce0dccd9235572bf1bb4f7277e2  ./src/lib/auth/request-provenance.ts
 c18fad65eea36e9fbdbfd2180cabfe4e15dd81825265898fadb52f9107281440  ./src/lib/auth/server.ts
 5bf8a524b265835d754bd36a506b7739fd67b267c07d8cd4c237568a7c26c2ec  ./src/lib/auth/trusted-origins.ts
@@ -90,9 +92,11 @@ bfc6953c341f29fb75797e050a1271a5ae928f7f6fbce4b781a8c80b52523130  ./src/lib/erro
 c9814ce9cf5f9d84c001266f601f0cf68806a5c7ff77e8abd7d262652b382d01  ./src/lib/gate/authorization.ts
 af8a54c7c0c31cab25adb5cae6b6207380267baf7962207d70a1ecf0210029d9  ./src/lib/gate/config.server.ts
 6fca19e411cb7957407647fdf17d7a9e6d392165400af123192b58307a038e11  ./src/lib/gate/crypto.server.ts
+f3e976292154f16c6c28f5573687b65a16183ad8cb166fbacea417571d1fa21d  ./src/lib/gate/discovery-evidence.ts
+2d9d4bfebdfa3ceca731ca2d453418241f67b5e6703106532dc06d48a5bc8bf8  ./src/lib/gate/discovery-templates.ts
 3178f2c6e0aec792d98ce0e397ed36f8a255c57f6c1a3d54c8fd61c9163defb2  ./src/lib/gate/falsifiers.ts
 4af8c072bdf7ddc5ad19f94e8e87f1d117a825840c06a6996d172578fb1859e6  ./src/lib/gate/policy.ts
-ba5012de41be403a2ad111e60a8912a6a3f9413e72dd7c2bfeef2ad799f8ad82  ./src/lib/gate/service.server.ts
+ea07724ea945a511be92d30c267efddcd6cadf5347636c73a00c96368f24575f  ./src/lib/gate/service.server.ts
 3cb93cbe6dffc7ca4486d25c338d0b7f94296e5e2b2fb7785d9dca1dcc34a234  ./src/lib/gate/tenant.server.ts
 570423c5d4675d59f5f08a988680dc5caa76a294a767ee261d6ce043820f6fde  ./src/lib/gate/types.ts
 d373b3e0018057bd4cb4da1b91dca14350b3d2626ee94352f8ceee51636da176  ./src/lib/gate/verifiers.server.ts
@@ -116,10 +120,10 @@ b3dda837f4602ee6dfc3bd38d22a5ce8f38b7c4339e5c3a6f956ab84adcff18a  ./src/routes/a
 7a4817ea2a863481083bf0fd3326782e75910b5a1513939b89f97405e05d94f7  ./src/routes/api/v1/candidates/$id/evidence.ts
 f0cb71815f650108744693e80b6fba9464ffbcba98c21f1551b0175ea25cc655  ./src/routes/api/v1/candidates/$id/receipt.ts
 b4ed79237cdd6292a2f9efdaa1e97f772e1917ca4fe52cf1fc0886ba12ca7ffc  ./src/routes/api/v1/repositories.ts
-5c9c5a7da5b83c358b8c26f2a7ee3958c69bd6bc453cb4f2dae9e87da82a4a0f  ./src/routes/discoveries.tsx
+34ef94dd339e57008331bed21f0d09e22bd4a0e88ea7bc223084a265bc4f4f22  ./src/routes/discoveries.tsx
 0eb57a63a2014915d829cf585d4e2c250bc93a571449fe4098e77596baee2ee3  ./src/routes/gates.tsx
 ea8afe2724620529d4dcffba8ace0985af10a20775306f699b4d4a9d61f62a5c  ./src/routes/index.tsx
-7e2b961643fe809eba3bab4d00da38d9030d64278a1226563620e7f5d30ff0ce  ./src/routes/login.tsx
+c0084d6aadd4e65da3fea46ea7eef14f9dfdbbc689001f442f84864f8e200b2a  ./src/routes/login.tsx
 671f362ed3e53e43651cc42d9cfc52b8bd4e62d3dfd99b40dc180f4cda59c99e  ./src/routes/overview.tsx
 4913184648c2f337626c00e8d2d94bd529535e1812374ed6a9fd3a02fe8bf119  ./src/routes/receipts.tsx
 b8ac0d3a29486200369fd15b8bd70bf945be90bc3b0685013bb8ab6390a39aaf  ./src/routes/repositories.tsx
@@ -131,8 +135,10 @@ f14aa05687e2ae0f710114e789bcdbb4af45428f7cd1845f760690852e9a282d  ./src/routes/w
 43783c9dd8f2112227d4f8158daaa7745c167b8cb8268c54f06753192f66607b  ./tests/auth-contract.test.mjs
 32c43b2d54d126068cc0789f6d6e23708a27f39e280dd1d6315cc1ca65d52697  ./tests/container-contract.test.mjs
 a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/database-resilience.test.mjs
+d919f834f57b8a4c2583a7381d4e98a82dad1798100d6f61cc6b92485290b5c1  ./tests/discovery-evidence.test.mjs
 8b774650360159179c1139562207dc698be818519c46140927f345a40954ff68  ./tests/executor-contract.test.mjs
 32f9168137b8345f8e14c3ac314c5e5aa3e95e94ea0456bd7a6a02aae4567536  ./tests/integration-contract.test.mjs
+0ab2d9d14c49e7629222d8dc38cf9f70f42aec7428a6786b27e34ab87565fb72  ./tests/key-generation.test.mjs
 986f2e3e40fc4f7bd75be848693212c0d6bd8560f89c32975cffc87bf21e15d6  ./tests/onboarding.test.mjs
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
