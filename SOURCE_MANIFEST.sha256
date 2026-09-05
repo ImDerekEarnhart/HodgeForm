@@ -11,7 +11,7 @@ d5f70677e99fa796ebb2c9b02bb148181895a044dff898a3b72a06d748bedd44  ./bin/hodgefor
 d7d34d958413cad9e411783850543206ccbe07c82a6c30cc3ef89ceba47c2e63  ./CHANGELOG.md
 ffb5a067dd12feafd01f785af654d608cea93718178e4c93871db92cf072e22a  ./docker-compose.local.yml
 c7e820c4ae1a23efef9cc12689a94d9b4963e64be98b53db57c276e62e626e73  ./docker-compose.production.yml
-b6cd436d98326f0f878c445407c68483d4f827ed7c1527444a4ad667002690a7  ./Dockerfile
+f57bedc653a1dc22947e862d03deae549caa2e8ba0adc800893bed856c9a0025  ./Dockerfile
 14ddea6a93dcb0e56d38b825afd2ddd84f55167eb97d686416015784af4227a1  ./docs/DATA_RETENTION.md
 59f41ff2fac8daa6453b9f190457a64ab20b409ac118fb34089eca2b361e52cf  ./docs/DISCOVERY_MODEL.md
 8944a921ec124dbfedd8216b5ad71da8c5038b7d00fe5636492ad9c7d6aba161  ./docs/INCIDENT_RESPONSE.md
@@ -122,6 +122,7 @@ b81360008d83ffd7b2e16ff38dc6d8be6085da438a1f37ae3d604652cb1633b1  ./src/routeTre
 9a4e4089cd1434a07b536c621cc09e6bea4bfa5aaa5e8bd3dabc53dd46f9aecf  ./src/server.ts
 476ea4c50cdee549f03232e63e0be624ba53cac23ce04d5204dd0cd0a8af5e5f  ./src/styles.css
 43783c9dd8f2112227d4f8158daaa7745c167b8cb8268c54f06753192f66607b  ./tests/auth-contract.test.mjs
+32c43b2d54d126068cc0789f6d6e23708a27f39e280dd1d6315cc1ca65d52697  ./tests/container-contract.test.mjs
 a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/database-resilience.test.mjs
 8b774650360159179c1139562207dc698be818519c46140927f345a40954ff68  ./tests/executor-contract.test.mjs
 32f9168137b8345f8e14c3ac314c5e5aa3e95e94ea0456bd7a6a02aae4567536  ./tests/integration-contract.test.mjs

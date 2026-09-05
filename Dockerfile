@@ -1,4 +1,5 @@
 FROM node:22-alpine AS build
+RUN apk upgrade --no-cache
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -9,12 +10,16 @@ RUN npm prune --omit=dev
 FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
-RUN addgroup -g 10001 hodgeform && adduser -D -u 10001 -G hodgeform hodgeform
-COPY --from=build /app/.output ./.output
-COPY --from=build /app/scripts ./scripts
-COPY --from=build /app/migrations ./migrations
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
+RUN apk upgrade --no-cache \
+ && addgroup -g 10001 hodgeform \
+ && adduser -D -u 10001 -G hodgeform hodgeform \
+ && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+ && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/pnpm /usr/local/bin/pnpx
+COPY --chown=hodgeform:hodgeform --from=build /app/.output ./.output
+COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migrate.mjs ./scripts/migrate.mjs
+COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migration-plan.mjs ./scripts/migration-plan.mjs
+COPY --chown=hodgeform:hodgeform --from=build /app/migrations ./migrations
+COPY --chown=hodgeform:hodgeform --from=build /app/node_modules ./node_modules
 USER hodgeform
 EXPOSE 3000
 CMD ["sh","-c","node scripts/migrate.mjs && node .output/server/index.mjs"]
