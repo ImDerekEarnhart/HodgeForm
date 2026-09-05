@@ -19,7 +19,9 @@ function releaseChannel(): { channel: ReleaseChannel; issue?: string } {
 export function publicReleaseConfig() {
   const resolvedChannel = releaseChannel();
   const channel = resolvedChannel.channel;
-  const enforced = process.env.NODE_ENV === "production" || channel !== "development";
+  // NODE_ENV selects the safe default channel above; the explicit channel is the
+  // policy authority so isolated development/test servers can opt out deliberately.
+  const enforced = channel !== "development";
   const publicRelease = channel === "public_ga";
   const issues: string[] = [];
   if (resolvedChannel.issue) issues.push(resolvedChannel.issue);

@@ -6,7 +6,7 @@ export function publicEmailConfigured() {
 
 export async function sendAuthEmail(input: { to: string; subject: string; text: string }) {
   const captureFile = env("HODGEFORM_EMAIL_CAPTURE_FILE");
-  if (process.env.NODE_ENV === "test" && captureFile) {
+  if (captureFile && (process.env.NODE_ENV === "test" || process.env.HODGEFORM_RELEASE_CHANNEL === "development")) {
     const { appendFile } = await import("node:fs/promises");
     await appendFile(captureFile, `${JSON.stringify({ ...input, capturedAt: new Date().toISOString() })}\n`, { mode: 0o600 });
     return;

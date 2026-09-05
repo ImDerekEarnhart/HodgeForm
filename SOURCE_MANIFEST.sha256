@@ -43,7 +43,7 @@ c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favic
 11c09962592e354d230526bef595ef5324e98f7f36cf5ba0291a6851fda6d256  ./README.md
 31e30435f50f33493910f4451aadb9fbf52f81040e9cb8df22859e156f430efb  ./RELEASE_STATUS.md
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
-6defefb33f581a01d24d85d5bb7e899b323d1edb85a4d79bb465291fd501cb87  ./scripts/auth-http-integration.mjs
+fc733a43e22a9fce1f499d153c88900d63a071ddeca5b1c09a576fce09c52433  ./scripts/auth-http-integration.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
 4e7b30816ee3e3e09060ab7cbc47c5b8ee5223fe3193d57e234e8d130de2b61f  ./scripts/db-loss-readiness.mjs
 a5634a451f4f567cbcc8d74a2f8e798c7e4ee760e9ba536e4224209b60a4711e  ./scripts/executor-container-smoke.sh
@@ -69,7 +69,7 @@ cdecf1fa8a1df9ee2cccc7fc1656ee1fa9e6fe2741d8d7bcaed4c1bcf35c8795  ./src/componen
 4b349763749069407c57e7188c1707ed09501ff7fb102ee6e990f45a39ecb563  ./src/components/ui/input.tsx
 7a6c3891e4d53c86887ccf4d1d07d7725cad8fb6dbaa47155f819d2e133fb753  ./src/lib/auth/client.ts
 66a7c07c0acf216e91ca92c323e54f029a01e52b6ebb43c8d77513e539b9f6d2  ./src/lib/auth/email-password.ts
-1e2939396895505f2e014116c99138fe272375d4a29fda6de5fc16b749a7c238  ./src/lib/auth/email.server.ts
+7b2e86da4f26f54e3930388724693df3596288c6ccd1b8e254591a4e98448a92  ./src/lib/auth/email.server.ts
 d95752afbaad22a71b4dc574bf5a3654307f1ea8f03791818812fc35a44123ad  ./src/lib/auth/gates.tsx
 93135c55bb215652b11244084279865a65cd442746a0bb2b61d1384103750d44  ./src/lib/auth/isolation.server.ts
 338b545be0eaf0db5321a2dde107a5fd2351e0953e6e1eb254aa057d7a53ae3c  ./src/lib/auth/middleware.ts
@@ -82,7 +82,7 @@ bfc6953c341f29fb75797e050a1271a5ae928f7f6fbce4b781a8c80b52523130  ./src/lib/erro
 182a8c30db30bca2a8531d390d61ba4259e9d30393aa81e600779df96eed319f  ./src/lib/gate/api-keys.server.ts
 8ae1872acd394f57505101ede0209ebfb98cb5abe4398f4eb4ffd9845a9ef376  ./src/lib/gate/api.ts
 c9814ce9cf5f9d84c001266f601f0cf68806a5c7ff77e8abd7d262652b382d01  ./src/lib/gate/authorization.ts
-0301db590063f86245765a5d4de5d29234936b95f9919541eb32560dd724b3a8  ./src/lib/gate/config.server.ts
+af8a54c7c0c31cab25adb5cae6b6207380267baf7962207d70a1ecf0210029d9  ./src/lib/gate/config.server.ts
 6fca19e411cb7957407647fdf17d7a9e6d392165400af123192b58307a038e11  ./src/lib/gate/crypto.server.ts
 3178f2c6e0aec792d98ce0e397ed36f8a255c57f6c1a3d54c8fd61c9163defb2  ./src/lib/gate/falsifiers.ts
 4af8c072bdf7ddc5ad19f94e8e87f1d117a825840c06a6996d172578fb1859e6  ./src/lib/gate/policy.ts
@@ -129,7 +129,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 58c7c5d83329bbf9999e270ad208a474bd417efb943c40c759272d11e1a3decc  ./tests/product-surface.test.mjs
-ec228444bd1b25385ac6976ba9aabe19d1177846873f3017ad0b3539d3522e26  ./tests/public-product.test.mjs
+cebbb8b699fd6050e68b6c2ebd46a0bbe1511bba2e7f0c77f1674d8d71aeda36  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs
 2f077c9139bbed5dfd0680d23e1c85ea1195a4ba96573e359e00551ef9264ca1  ./tests/security.test.mjs

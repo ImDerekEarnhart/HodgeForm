@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const config = await readFile(new URL("../src/lib/gate/config.server.ts", import.meta.url), "utf8");
 const auth = await readFile(new URL("../src/lib/auth/server.ts", import.meta.url), "utf8");
+const email = await readFile(new URL("../src/lib/auth/email.server.ts", import.meta.url), "utf8");
 const pages = await readFile(new URL("../src/lib/ops/public-pages.server.ts", import.meta.url), "utf8");
 const compose = await readFile(new URL("../docker-compose.production.yml", import.meta.url), "utf8");
 
@@ -19,8 +20,15 @@ test("controlled beta stays production-safe without impersonating public GA", ()
   assert.match(config, /public_ga/);
   assert.match(config, /controlled beta must keep HODGEFORM_ALLOW_SIGNUPS=false/);
   assert.match(config, /channel === "public_ga"[\s\S]*HODGEFORM_LEGAL_REVIEWED/);
+  assert.match(config, /const enforced = channel !== "development"/);
+  assert.match(config, /process\.env\.NODE_ENV === "production" \? "controlled_beta" : "development"/);
   assert.match(compose, /HODGEFORM_RELEASE_CHANNEL:[^\n]*controlled_beta/);
   assert.match(compose, /HODGEFORM_ALLOW_SIGNUPS:[^\n]*false/);
+});
+
+test("auth email capture is limited to test or explicit development channels", () => {
+  assert.match(email, /process\.env\.NODE_ENV === "test"/);
+  assert.match(email, /HODGEFORM_RELEASE_CHANNEL === "development"/);
 });
 
 test("public pages state the receipt boundary and vulnerability contact", () => {
