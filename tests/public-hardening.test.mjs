@@ -53,3 +53,27 @@ test("CSRF protection rejects foreign and null origins without Fetch Metadata", 
     method: "POST", headers: { "sec-fetch-site": "same-site" },
   }), origin), false);
 });
+
+import { boundedRequestBody, RequestBodyError } from "../src/lib/security/request-body.ts";
+
+test("request body guard preserves valid JSON and enforces actual streamed bytes", async () => {
+  const valid = new Request("https://hodgeform.com/api/test", { method: "POST", body: '{"ok":true}' });
+  assert.deepEqual(await (await boundedRequestBody(valid, 20)).json(), { ok: true });
+  for (const declared of [undefined, "1", "9999"]) {
+    const request = new Request("https://hodgeform.com/api/test", {
+      method: "POST", body: "x".repeat(100),
+      headers: declared === undefined ? {} : { "content-length": declared },
+    });
+    await assert.rejects(boundedRequestBody(request, 20), (error) => error instanceof RequestBodyError && error.status === 413);
+  }
+});
+
+test("request body guard times out and cancels a stalled upload", async () => {
+  let cancelled = false;
+  const request = new Request("https://hodgeform.com/api/test", {
+    method: "POST", duplex: "half",
+    body: new ReadableStream({ cancel() { cancelled = true; } }),
+  });
+  await assert.rejects(boundedRequestBody(request, 20, 20), (error) => error instanceof RequestBodyError && error.status === 408);
+  assert.equal(cancelled, true);
+});

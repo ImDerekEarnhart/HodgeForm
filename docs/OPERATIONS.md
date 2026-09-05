@@ -81,3 +81,8 @@ and verify database backups and a restore drill before accepting customer data.
 Set the service variables from `.env.production.example` together with DATABASE_URL,
 BETTER_AUTH_URL=https://hodgeform.com, and HODGEFORM_EMAIL_PASSWORD_AUTH=true.
 The example values are documentation, not launch-ready business identity or secrets.
+
+Dynamic application requests are limited to 1 MiB and a 10-second body-read deadline
+before JSON/form parsing. Oversized requests return 413; stalled uploads return 408.
+Enforce connection and request-rate limits at the trusted ingress as well: a body
+limit does not provide aggregate protection against many simultaneous connections.

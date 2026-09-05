@@ -22,7 +22,7 @@ c7e820c4ae1a23efef9cc12689a94d9b4963e64be98b53db57c276e62e626e73  ./docker-compo
 59f41ff2fac8daa6453b9f190457a64ab20b409ac118fb34089eca2b361e52cf  ./docs/DISCOVERY_MODEL.md
 8944a921ec124dbfedd8216b5ad71da8c5038b7d00fe5636492ad9c7d6aba161  ./docs/INCIDENT_RESPONSE.md
 5a5e732978b35f2b54062c69a58e0c5c0ca2c19516c64d834d771adcbc7481c6  ./docs/KEY_ROTATION.md
-3b0c1e5e927cb66706cc833842df87f908750d05430f08565c0bc19e4c4afff9  ./docs/OPERATIONS.md
+3fa3595ee4fdcec04b34e56fbfcc7d63fd2d034dddfd2941de6039b8db71bbc0  ./docs/OPERATIONS.md
 9eb3325e77208e1fadc0d4ee6160c2007aec147f3b6e07098cda3a723478328c  ./docs/POLICY_PACKS.md
 6f6e600846c45061b48391a925542bb3ac34bafc88fc3b484ab690a2dd63cee2  ./docs/PRODUCT_MANIFESTO.md
 f348eddd3ce1bc037d6f904a4d0998083f5775cc06f467da06f395943fd5147a  ./docs/QUICKSTART.md
@@ -102,6 +102,7 @@ e88447d2966ac958ee9d196e5b1ef67a53b18d056735c8dc24bb72572ed0e1ac  ./src/lib/ops/
 5ddabbb42bd1d789bb48665233297960c130dc68a620dbc257d1930937a3e02a  ./src/lib/runtime/model-provider.server.ts
 aff81f5987445ecb5a6623424f6061fe8af7b8fd095ae9c1342fa3dff66e8ce3  ./src/lib/runtime/sandbox.server.ts
 0e2a62c583553409563ebb1b9e463fdf2366c474b2b613441653bd3f983e95ef  ./src/lib/security/rate-limit.server.ts
+e2dff721fe5224a307a003a5a1103f394fba99e7deec92801cd57c3c535eb91b  ./src/lib/security/request-body.ts
 1ecf511f9d368431912ca9b8c7b6bf7c267cdadf49b5adddfa601143affe7d52  ./src/lib/use-async.ts
 5db9cf489cb1a89f1d0b2661804206c3dce28d4f1a2d11a77ad14d07e4ee8ea8  ./src/lib/utils.ts
 b81360008d83ffd7b2e16ff38dc6d8be6085da438a1f37ae3d604652cb1633b1  ./src/routeTree.gen.ts
@@ -125,7 +126,7 @@ b8ac0d3a29486200369fd15b8bd70bf945be90bc3b0685013bb8ab6390a39aaf  ./src/routes/r
 9f1e6b40a3d9454c4e6f6fd85faf126fb858093e6ccc84fed6974547cb11d576  ./src/routes/reset-password.tsx
 13272ed9cb784e9971e3d10ff73433d7944c813bd724d5a7c9d934c7ba0ea5ce  ./src/routes/verify.tsx
 f14aa05687e2ae0f710114e789bcdbb4af45428f7cd1845f760690852e9a282d  ./src/routes/workspace.tsx
-c71ca9fe3171dd5b9f10b6e53ad4ab7bd5a01940c252e0f0a2d4f54871c1de6a  ./src/server.ts
+559dbfcaa2ace3aeb1f5faaf3b7ec05d36e55041ff5bf3bb695cc69eabd35dc4  ./src/server.ts
 476ea4c50cdee549f03232e63e0be624ba53cac23ce04d5204dd0cd0a8af5e5f  ./src/styles.css
 43783c9dd8f2112227d4f8158daaa7745c167b8cb8268c54f06753192f66607b  ./tests/auth-contract.test.mjs
 32c43b2d54d126068cc0789f6d6e23708a27f39e280dd1d6315cc1ca65d52697  ./tests/container-contract.test.mjs
@@ -136,7 +137,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 ddb094dc38a90ad81f9f56baeb8169c57e7074dc816be32cebf7768a0d5eb23e  ./tests/product-surface.test.mjs
-4bba28d2e6cd203362e964fd878fdd17e4925c381ebc6d54d85d14bbae6154f2  ./tests/public-hardening.test.mjs
+6605e655ba83d6275752473a161dce2939145f4336970c759b3b041e17b7b107  ./tests/public-hardening.test.mjs
 e0ac0537db6ae5467d0ad9f9e3162c046710b0efb24d199790f05447ca6b0fe3  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs
