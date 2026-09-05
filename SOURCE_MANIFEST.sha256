@@ -74,7 +74,7 @@ d95752afbaad22a71b4dc574bf5a3654307f1ea8f03791818812fc35a44123ad  ./src/lib/auth
 93135c55bb215652b11244084279865a65cd442746a0bb2b61d1384103750d44  ./src/lib/auth/isolation.server.ts
 338b545be0eaf0db5321a2dde107a5fd2351e0953e6e1eb254aa057d7a53ae3c  ./src/lib/auth/middleware.ts
 4ace59f2a87243de957c618d101501a7c18ecc78096b7ebf5a7a0564dac66c05  ./src/lib/auth/pglite-dialect.ts
-978b24151b8b526870e8d9b99c51c40c2184ee3900a7a784a71b00019c4ca61e  ./src/lib/auth/server.ts
+af94d597aca9029b6b0aeffb679a03d4573ed854c033f8e9658dcdf4f9c7042a  ./src/lib/auth/server.ts
 045f0379957e31cbf9800da45026cbee99414304239c61f2b8fe09deb7101446  ./src/lib/auth/use-current-user.ts
 837ffd4fa9956dc2b3f37db46da95b942dc30cc9ae0862d3f1314fa4b09f92d1  ./src/lib/auth/verify.server.ts
 dea5a7f596ba81218f3c7507495c6f3f6307dba34aff387dce518680c27e5dd4  ./src/lib/db.ts
@@ -129,7 +129,7 @@ a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/databa
 ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 58c7c5d83329bbf9999e270ad208a474bd417efb943c40c759272d11e1a3decc  ./tests/product-surface.test.mjs
-cebbb8b699fd6050e68b6c2ebd46a0bbe1511bba2e7f0c77f1674d8d71aeda36  ./tests/public-product.test.mjs
+e0ac0537db6ae5467d0ad9f9e3162c046710b0efb24d199790f05447ca6b0fe3  ./tests/public-product.test.mjs
 5930803c4b2b39e727709ef7ea186a9ad5ba6c6f2dcfb8886188a1827d4f87d8  ./tests/receipt-verifier.test.mjs
 dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/security-pipeline.test.mjs
 2f077c9139bbed5dfd0680d23e1c85ea1195a4ba96573e359e00551ef9264ca1  ./tests/security.test.mjs

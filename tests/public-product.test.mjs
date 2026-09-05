@@ -43,3 +43,8 @@ test("account deletion is verified and cannot orphan a last-owner workspace", ()
   assert.match(auth, /Transfer workspace ownership/);
   assert.match(auth, /update api_tokens set revoked_at/);
 });
+
+test("password reset revocation cannot be masked by a session cookie cache", () => {
+  assert.match(auth, /revokeSessionsOnPasswordReset: true/);
+  assert.match(auth, /cookieCache: \{ enabled: false \}/);
+});

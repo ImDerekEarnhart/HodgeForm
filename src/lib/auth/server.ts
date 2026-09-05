@@ -59,7 +59,9 @@ export const auth = betterAuth({
       },
     },
   },
-  session: { cookieCache: { enabled: true, maxAge: 300 } },
+  // Resetting a password revokes every database session. Do not let a signed
+  // cookie cache continue to authorize one of those revoked sessions.
+  session: { cookieCache: { enabled: false } },
   rateLimit: {
     enabled: true,
     window: 60,
