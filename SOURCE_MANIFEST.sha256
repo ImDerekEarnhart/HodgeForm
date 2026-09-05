@@ -43,7 +43,7 @@ c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favic
 11c09962592e354d230526bef595ef5324e98f7f36cf5ba0291a6851fda6d256  ./README.md
 31e30435f50f33493910f4451aadb9fbf52f81040e9cb8df22859e156f430efb  ./RELEASE_STATUS.md
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
-fbc25b83cbc4ca01ba4b612a89e52dc9b246a0dcee53af1f6e8ca3dd39d7f6f4  ./scripts/auth-http-integration.mjs
+a2ddb58831c2b004b071b80fc467ce6404cc6a92cb86a87c4baa730d568a3540  ./scripts/auth-http-integration.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
 4e7b30816ee3e3e09060ab7cbc47c5b8ee5223fe3193d57e234e8d130de2b61f  ./scripts/db-loss-readiness.mjs
 a5634a451f4f567cbcc8d74a2f8e798c7e4ee760e9ba536e4224209b60a4711e  ./scripts/executor-container-smoke.sh
