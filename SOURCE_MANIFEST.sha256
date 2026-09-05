@@ -1,7 +1,7 @@
 e2967477c784cc3f615767976620fd38b9645321e295319283e35ab35b7c6954  ./.dockerignore
 774cf5444adcd71ece5c67712a5e4d54fcefa8bafd93c315c34d681484936331  ./.env.example
 2cb9bcaa85f70573b836b6c1cf17bc4f7eb21b1562c42f7dc50bb30675cd1c2f  ./.env.production.example
-a634fb084857c49ac9da060373e6a3b6a7dadb88a788028ad1c915bb3abf9bcd  ./.github/workflows/release.yml
+d74aeb392fb8a4bc0f53891d8e4366c92d6395f499d2941c6919985d32ff3415  ./.github/workflows/release.yml
 4761d2d54e7bae565ce5e9dab5efc14383387764e547786a6cc3802780685eeb  ./.github/workflows/security.yml
 9f1ce6e741241b51989cc021dbd6502865cb670039633a016edff3dd91cfca6f  ./.gitignore
 d5f90f76c5b68ce7be5ba077813f97e1983511b8c314764537345a538c1261f4  ./.prettierrc
@@ -23,7 +23,7 @@ fbd952d7a2ca7a86ec97b05ff8085e253a4dd9bf5955499c08270f9f784e83a2  ./docs/DISCOVE
 59f41ff2fac8daa6453b9f190457a64ab20b409ac118fb34089eca2b361e52cf  ./docs/DISCOVERY_MODEL.md
 8944a921ec124dbfedd8216b5ad71da8c5038b7d00fe5636492ad9c7d6aba161  ./docs/INCIDENT_RESPONSE.md
 5a5e732978b35f2b54062c69a58e0c5c0ca2c19516c64d834d771adcbc7481c6  ./docs/KEY_ROTATION.md
-3fa3595ee4fdcec04b34e56fbfcc7d63fd2d034dddfd2941de6039b8db71bbc0  ./docs/OPERATIONS.md
+9dc10eaed1af9bb6f0ad252fd45fc00528f3550245eb69944d0dac0282b3fef3  ./docs/OPERATIONS.md
 9eb3325e77208e1fadc0d4ee6160c2007aec147f3b6e07098cda3a723478328c  ./docs/POLICY_PACKS.md
 6f6e600846c45061b48391a925542bb3ac34bafc88fc3b484ab690a2dd63cee2  ./docs/PRODUCT_MANIFESTO.md
 f348eddd3ce1bc037d6f904a4d0998083f5775cc06f467da06f395943fd5147a  ./docs/QUICKSTART.md
@@ -61,6 +61,7 @@ aef4a44cf529998f3812e5149454b08ca19c5bc1e94f72d9abf030b822a01f0c  ./scripts/post
 38806d4b60432d3d69693cfcd2e83f37c739e521b2baace9f1926a74a6ce3e01  ./scripts/postgres-backup.sh
 63e06891630c4e02a1dbab8d812af6859a7920b1c1fbf1e606bd55ec7ea4465e  ./scripts/postgres-http-integration.mjs
 ffce0bdf88c6ce566f3db8fdda9f45ef7d1001c03735cf797198428fccd35694  ./scripts/postgres-restore.sh
+e7592d83af5ae9681dc954248ae63c1d0788cdfeb29499f652cd175ee58b6c69  ./scripts/preview-http-smoke.mjs
 31eeea403d5ba67cd0fb59eb999b80ce2cd43fa86f290ec427fccb95d69c0975  ./scripts/provision-operator.mjs
 298b9f7b555af470e8e06c82b3261312b4b5e316c8652aec808c0c93f6f5d2a2  ./scripts/security-static-scan.mjs
 2ec14f44cbba1b080ac2729c0f9a3f1163bf03316492d14c0586542a176178aa  ./scripts/trust-boundary-demo.mjs
@@ -85,7 +86,7 @@ c18fad65eea36e9fbdbfd2180cabfe4e15dd81825265898fadb52f9107281440  ./src/lib/auth
 5bf8a524b265835d754bd36a506b7739fd67b267c07d8cd4c237568a7c26c2ec  ./src/lib/auth/trusted-origins.ts
 045f0379957e31cbf9800da45026cbee99414304239c61f2b8fe09deb7101446  ./src/lib/auth/use-current-user.ts
 837ffd4fa9956dc2b3f37db46da95b942dc30cc9ae0862d3f1314fa4b09f92d1  ./src/lib/auth/verify.server.ts
-dea5a7f596ba81218f3c7507495c6f3f6307dba34aff387dce518680c27e5dd4  ./src/lib/db.ts
+5751c25b15f924c9b8d2ea20ae1d4a7a6efa0f69fce20eedad05f544481abdc0  ./src/lib/db.ts
 bfc6953c341f29fb75797e050a1271a5ae928f7f6fbce4b781a8c80b52523130  ./src/lib/error-component.tsx
 182a8c30db30bca2a8531d390d61ba4259e9d30393aa81e600779df96eed319f  ./src/lib/gate/api-keys.server.ts
 8ae1872acd394f57505101ede0209ebfb98cb5abe4398f4eb4ffd9845a9ef376  ./src/lib/gate/api.ts
@@ -151,4 +152,4 @@ dd62141b574b95f6f0bc5d122399a43daa07ff0bee3748f42983aa58d06b0ce7  ./tests/securi
 9f6a224d501891215a7815fc81c152d0417426ecc7ded3bb50ea865f7d79535c  ./tests/trust-boundary-regression.test.mjs
 4fc46f39e7b73bf78161400fbb929aff41bcf23eac3b4ca9e31094ddc3d97f08  ./tests/trust-compiler-v11.test.mjs
 da8efa3303d729fcf97a8de11c27078d5fcf6c69f75c6951110303b470f2827f  ./tsconfig.json
-7b64c62417c1a4f329681cdfcf8a0b212db01650bb22e5277d5f033df6c709d1  ./vite.config.ts
+691c5a58f72acdb034f07c743e2a3dfb4ef18e502f150d8050f2434e84d0ad10  ./vite.config.ts

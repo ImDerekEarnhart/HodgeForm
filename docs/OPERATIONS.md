@@ -64,6 +64,12 @@ Set explicit retention for database backups, logs, exported receipts and custome
 
 ## Railway application service
 
+The Node server requires installed production dependencies alongside `.output`.
+PGlite remains external so its WASM/data files resolve within its installed package;
+the Docker image includes those dependencies. Embedded storage is for local testing
+only. The built-preview smoke exercises both runtime signup settings, migrations,
+and locally captured verification email without using production mail or data.
+
 The source-controlled `railway.json` builds the unprivileged Docker image, runs
 migrations as a separate pre-deploy step, starts the application without repeating
 migrations, and checks `/api/ready` before routing traffic. Start with one replica;

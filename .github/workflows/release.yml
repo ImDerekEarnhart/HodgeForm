@@ -37,6 +37,8 @@ jobs:
       - run: node scripts/security-static-scan.mjs
       - run: npm run brand:check
       - run: npm run release:check
+      - name: Built preview database and runtime signup policy
+        run: node scripts/preview-http-smoke.mjs
       - run: python -m py_compile executor/server.py
       - run: npm run db:migrate
       - name: Invite-only operator provisioning smoke

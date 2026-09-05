@@ -29,11 +29,17 @@ export default defineConfig(({ command }) => ({
   server: { host: "0.0.0.0", port: 8080, strictPort: true },
   preview: { host: "127.0.0.1", port: 8081, strictPort: true },
   resolve: { tsconfigPaths: true },
+  // PGlite locates WASM/data relative to its package, not a bundled JS chunk.
+  ssr: { external: ["@electric-sql/pglite"] },
   plugins: [
     pgliteBootstrapPlugin(),
     tailwindcss(),
     tanstackStart(),
-    ...(command === "build" ? [nitro({ preset: "node-server" })] : []),
+    ...(command === "build" ? [nitro({
+      preset: "node-server",
+      rolldownConfig: { external: ["@electric-sql/pglite"] },
+      traceDeps: ["@electric-sql/pglite*"],
+    })] : []),
     viteReact(),
   ],
 }));

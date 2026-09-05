@@ -49,7 +49,9 @@ async function getEmbedded(): Promise<import("@electric-sql/pglite").PGlite> {
   const pg = await globalRef.__hfPglitePromise__;
   const migrate = async () => {
     let migrations: Record<string, string>;
-    if (typeof import.meta.glob === "function") {
+    // Vite replaces glob calls but does not preserve import.meta.glob at runtime.
+    // SSR is a compile-time constant in the bundle and absent in direct Node tests.
+    if (import.meta.env?.SSR || typeof import.meta.glob === "function") {
       migrations = import.meta.glob("/migrations/*.sql", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
     } else {
       // Direct Node-based integration tests do not provide Vite's import.meta.glob.
