@@ -30,15 +30,26 @@ legal certification, customer-traction proof, or universal safety claim.
   readiness routes returned expected responses; rendered landing, verifier, overview, and
   gates screens were visually inspected.
 
-## Final gate still required
+## Final clean hosted verification — PASS
 
-The system `C:` drive filled while the staged 1.1.1 copy was being prepared. Therefore this
-file does **not** claim a new one-command `npm ci -> npm run release:check` proof for the final
-version-metadata-only staged tree. The canonical GitHub Actions release job is required to
-establish that clean proof, including real PostgreSQL, auth lifecycle, backup/restore, Compose,
-image build, and executor-isolation checks.
+The staged copy was prepared on a full `C:` drive, so the final clean proof was deliberately run
+in a fresh GitHub-hosted environment rather than being inferred from the local machine. The
+canonical [`release-gate` run](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167237)
+passed on 2026-09-05 for commit `79fe9da673549f96cd5d73b5a2ac3e65ef5cdf83`.
 
-See [`docs/SHIP_CHECKLIST.md`](docs/SHIP_CHECKLIST.md) for the exact remaining release gates.
+- Fresh `npm ci`, production dependency audit, static scan, brand check, typecheck, lint,
+  executed suite, TrustBench, and production build: **PASS**.
+- PostgreSQL migration, guarded first-operator provisioning, tenant/API integration, password
+  reset/session revocation lifecycle, database-loss readiness, and PostgreSQL 17 backup/restore:
+  **PASS**.
+- Production Compose, hardened application image, and no-network/auth/resource-limited executor
+  smoke: **PASS**.
+- Paired [`security-scan`](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167278):
+  Trivy filesystem/container scans and CodeQL analysis: **PASS**. The CodeQL SARIF is retained as
+  a workflow artifact; this record does not claim that GitHub's hosted Code Scanning alert UI is
+  enabled for the private repository.
+
+See [`docs/SHIP_CHECKLIST.md`](docs/SHIP_CHECKLIST.md) for the remaining live-deployment gates.
 
 ## External gates before public GA
 

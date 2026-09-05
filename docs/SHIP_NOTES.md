@@ -20,6 +20,16 @@ artifact is universally safe, compliant, or correct.
 - Made `/api/health` a liveness-only endpoint and `/api/ready` a configuration-plus-database
   readiness endpoint.
 
+## Verified release evidence
+
+- The clean hosted [`release-gate`](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167237)
+  passed for the final hardened source: dependency/audit checks, product suite, PostgreSQL
+  migration and restore, operator provisioning, API/auth lifecycle, readiness loss, Compose,
+  production image, and executor isolation.
+- The paired [`security-scan`](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167278)
+  passed Trivy filesystem/container scans and CodeQL analysis, retaining the CodeQL SARIF as an
+  Actions artifact.
+
 ## Known boundaries
 
 - Receipt records are intentionally long-lived audit artifacts. Evidence/receipt expiration

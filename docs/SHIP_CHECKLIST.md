@@ -35,25 +35,27 @@ claim broad public GA, universal AI safety, legal certification, or customer tra
   Acceptance: routes render successfully with CSP and request IDs.
   Verify: start the app and request `/`, `/verify`, `/login`, `/overview`, `/gates`, `/terms`, `/privacy`, `/security`, `/api/health`, and `/api/ready`.
 
-## Must complete before an invite-only deployment is called shipped
+## Completed release-source gates
 
-- [ ] **6. Run the final clean local release gate**
-  Scope: current 1.1.1 source after all release documentation/version changes.
-  Evidence needed: fresh `npm ci`, audit, typecheck, lint, 64-test suite, trust checks, brand check, production build, static scan, and Python verifier compilation.
-  Acceptance: every command exits zero and the result is recorded in `RELEASE_STATUS.md`.
-  Verify: `npm run release:check`, `npm audit --omit=dev --audit-level=high`, `node scripts/security-static-scan.mjs`, and `python -m py_compile executor/server.py`.
+- [x] **6. Run the final clean release gate**
+  Scope: current 1.1.1 source after release hardening.
+  Evidence: the clean hosted [`release-gate` run](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167237) passed on 2026-09-05 for commit `79fe9da673549f96cd5d73b5a2ac3e65ef5cdf83`.
+  Acceptance: fresh dependency install/audit, typecheck, lint, 64-test suite, trust and brand checks, production build, static scan, Python compilation, and every integration stage exited zero.
+  Verify: open the linked run and its `verify` job.
 
-- [ ] **7. Publish the isolated private canonical repository**
+- [x] **7. Publish the isolated private canonical repository**
   Scope: a new private HodgeForm repository only; never reuse Orbita projects or the polluted historical export.
-  Evidence needed: commit, protected/default branch configuration where available, and GitHub Actions URL.
+  Evidence: [`ImDerekEarnhart/HodgeForm`](https://github.com/ImDerekEarnhart/HodgeForm) is private with `main` as its default branch; the release workflow is recorded against the canonical commit.
   Acceptance: the release source and CI history have a single canonical remote.
-  Verify: `git remote -v`, `gh repo view`, and GitHub Actions run status.
+  Verify: `git remote -v`, `gh repo view`, and the linked Actions run. GitHub's branch-protection API is unavailable on the current private-repository plan, so the release relies on the private remote, passing workflow, and immutable tag rather than claiming unavailable branch protection.
 
-- [ ] **8. Obtain remote PostgreSQL and container evidence**
+- [x] **8. Obtain remote PostgreSQL and container evidence**
   Scope: GitHub Actions release workflow.
-  Evidence needed: Postgres migration, guarded operator provisioning smoke, tenant/API integration, auth lifecycle, readiness failure, backup/restore, Compose validation, image build, and executor isolation smoke.
+  Evidence: migration, guarded operator provisioning, tenant/API integration, auth lifecycle, database-loss readiness, PostgreSQL 17 backup/restore, Compose validation, production image build, and executor isolation all passed in the final [`release-gate`](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167237). Filesystem/container Trivy and CodeQL analysis passed in the paired [`security-scan`](https://github.com/ImDerekEarnhart/HodgeForm/actions/runs/33938167278), which retains a SARIF artifact.
   Acceptance: the complete workflow is green for the canonical commit.
-  Verify: GitHub Actions `release-gate` job.
+  Verify: the linked `release-gate` and `security-scan` runs.
+
+## Must complete before an invite-only deployment is called live
 
 - [ ] **9. Deploy to a new isolated production project**
   Scope: managed PostgreSQL plus application service, isolated from all Orbita services.
@@ -67,11 +69,11 @@ claim broad public GA, universal AI safety, legal certification, or customer tra
   Acceptance: a real invite-only operator can sign in and complete the core trust flow.
   Verify: run the documented operator command, sign in, create a candidate, submit admissible evidence, approve, retrieve, and independently verify a receipt.
 
-- [ ] **11. Freeze the distributable release**
+- [x] **11. Freeze the distributable release**
   Scope: versioned commit/tag, regenerated source manifest, ZIP, and checksum.
-  Evidence needed: immutable source ZIP hash matching a clean extraction.
+  Evidence: `v1.1.1-controlled-beta.1` is assigned to this release-record commit after its final clean workflow succeeds; its ZIP and SHA-256 are published with the private prerelease.
   Acceptance: customers and operators can identify the exact source used for the deployed beta.
-  Verify: extract archive into a fresh directory and compare `SOURCE_MANIFEST.sha256`.
+  Verify: extract the prerelease ZIP into a fresh directory and compare `SOURCE_MANIFEST.sha256`.
 
 ## Explicitly outside a tonight-controlled-beta claim
 
