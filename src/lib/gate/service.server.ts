@@ -4,7 +4,7 @@ import { compilePolicy, evaluateRequirement, summarizeTrustTransition, APPROVAL_
 import { canonicalize, sha256, signReceipt } from "./crypto.server";
 import { tenantForUser, userCanAccessTenant, requireReleaseAuthority } from "./tenant.server";
 import { assertPublicReleaseReady, publicReleaseConfig } from "./config.server";
-import type { AgentManifest, Capability, CompiledPolicy, EvidenceAuthContext, EvidenceInput, Independence, PolicyIntent } from "./types";
+import type { AgentManifest, Capability, CompiledPolicy, EvidenceAuthContext, EvidenceInput, Independence, JsonValue, PolicyIntent, Risk } from "./types";
 import { enforceAgentRateLimit } from "@/lib/security/rate-limit.server";
 import { teacherChat } from "@/lib/runtime/model-provider.server";
 import { deterministicAdversarialProposals } from "./falsifiers";
@@ -32,10 +32,39 @@ function organizationPolicyOverlay() {
 type CandidateRow = {
   id: string; tenant_id: string; repository_id: string; version: string; artifact_hash: string;
   manifest_json: unknown; capabilities_json: unknown; policy_intent_json: unknown; semantic_diff_json: unknown;
-  risk: string; status: string; created_by: string; created_at: string;
+  risk: Risk; status: string; created_by: string; created_at: string;
 };
 type PlanRow = { id: string; candidate_id: string; compiled_policy_json: unknown; policy_hash: string; pack_id: string; pack_version: number };
 type EvidenceRow = { id: string; requirement_id: string; evidence_kind: string; outcome: string; independence: Independence; source: string; payload_hash: string; payload_json: unknown; verifier_principal_id?: string | null; created_by: string; created_at: string };
+type SemanticDiff = { previousCapabilities: Capability[]; addedCapabilities: Capability[]; removedCapabilities: Capability[] };
+type OverviewCandidateRow = {
+  id: string; version: string; status: string; risk: Risk; artifact_hash: string; created_at: string;
+  repository_name: string; repository_slug: string; policy_hash: string | null; compiled_policy_json: unknown;
+};
+type RepositorySummary = {
+  id: string; name: string; slug: string; description: string; created_at: string;
+  candidate_count: number; discovery_count: number; last_candidate_at: string | null;
+};
+type CandidateSummaryRow = {
+  id: string; version: string; artifact_hash: string; status: string; risk: Risk; capabilities_json: unknown;
+  semantic_diff_json: unknown; created_by: string; created_at: string; repository_name: string; repository_slug: string;
+  policy_hash: string | null; compiled_policy_json: unknown; verdict: "RELEASE" | "BLOCK" | null; receipt_hash: string | null;
+};
+type ReceiptRow = {
+  id: string; tenant_id: string; candidate_id: string; verdict: "RELEASE" | "BLOCK"; receipt_json: unknown;
+  receipt_hash: string; signer_id: string; signature_b64: string; public_key_fingerprint: string; created_at: string;
+};
+type ReceiptListRow = ReceiptRow & { version: string; artifact_hash: string; repository_name: string; repository_slug: string };
+type DiscoveryRow = {
+  id: string; parent_id: string | null; branch: string; title: string; claim: string; status: string; content_hash: string;
+  evidence_refs_json: unknown; created_by: string; created_at: string; repository_name: string; repository_slug: string;
+};
+
+function jsonObject(value: unknown): Record<string, JsonValue> {
+  const parsed = asObject<unknown>(value);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Expected a JSON object");
+  return parsed as Record<string, JsonValue>;
+}
 
 async function requireRepo(sql: Sql, tenant: string, repositoryId: string) {
   const [repo] = await sql.query<{ id: string; name: string; slug: string; description: string; created_by: string; created_at: string }>(
@@ -56,7 +85,7 @@ export async function getOverview(userId: string) {
     sql.query<{ count: number }>("select count(*)::bigint as count from discovery_commits where tenant_id=$1", [tenant]),
     sql.query<{ count: number }>("select count(*)::bigint as count from release_receipts where tenant_id=$1", [tenant]),
   ]);
-  const latest = await sql.query<Record<string, unknown>>(
+  const latest = await sql.query<OverviewCandidateRow>(
     `select c.id,c.version,c.status,c.risk,c.artifact_hash,c.created_at,r.name as repository_name,r.slug as repository_slug,
       gp.policy_hash, gp.compiled_policy_json
      from release_candidates c join repositories r on r.id=c.repository_id
@@ -72,7 +101,7 @@ export async function getOverview(userId: string) {
 
 export async function listRepositories(userId: string, tenantOverride?: string) {
   const tenant = await resolveTenant(userId, tenantOverride); const sql = await getSql();
-  return sql.query<Record<string, unknown>>(
+  return sql.query<RepositorySummary>(
     `select r.id,r.name,r.slug,r.description,r.created_at,
       count(distinct c.id)::bigint as candidate_count,
       count(distinct d.id)::bigint as discovery_count,
@@ -101,7 +130,7 @@ export async function listCandidates(userId: string, repositoryId?: string, tena
   const params: unknown[] = [tenant];
   let where = "c.tenant_id=$1";
   if (repositoryId) { params.push(repositoryId); where += ` and c.repository_id=$${params.length}`; }
-  const rows = await sql.query<Record<string, unknown>>(
+  const rows = await sql.query<CandidateSummaryRow>(
     `select c.id,c.version,c.artifact_hash,c.status,c.risk,c.capabilities_json,c.semantic_diff_json,c.created_by,c.created_at,
       r.name as repository_name,r.slug as repository_slug,gp.policy_hash,gp.compiled_policy_json,
       rr.verdict,rr.receipt_hash
@@ -110,7 +139,7 @@ export async function listCandidates(userId: string, repositoryId?: string, tena
      left join release_receipts rr on rr.candidate_id=c.id
      where ${where} order by c.created_at desc limit 200`, params,
   );
-  return rows.map((r) => ({ ...r, capabilities_json: asObject(r.capabilities_json), semantic_diff_json: asObject(r.semantic_diff_json), compiled_policy_json: r.compiled_policy_json ? asObject(r.compiled_policy_json) : null }));
+  return rows.map((r) => ({ ...r, capabilities_json: asObject<Capability[]>(r.capabilities_json), semantic_diff_json: asObject<SemanticDiff>(r.semantic_diff_json), compiled_policy_json: r.compiled_policy_json ? asObject<CompiledPolicy>(r.compiled_policy_json) : null }));
 }
 
 export async function createCandidate(userId: string, input: { repositoryId: string; version: string; artifactHash: string; manifest: AgentManifest; intent: PolicyIntent }, tenantOverride?: string) {
@@ -168,21 +197,21 @@ export async function getCandidate(userId: string, candidateId: string, tenantOv
   const [plan] = await sql.query<PlanRow>("select * from gate_plans where tenant_id=$1 and candidate_id=$2", [tenant, candidateId]);
   if (!plan) throw new Error("Frozen gate plan not found");
   const evidence = await sql.query<EvidenceRow>("select * from evidence_receipts where tenant_id=$1 and candidate_id=$2 order by created_at asc", [tenant, candidateId]);
-  const [receipt] = await sql.query<Record<string, unknown>>("select * from release_receipts where tenant_id=$1 and candidate_id=$2", [tenant, candidateId]);
+  const [receipt] = await sql.query<ReceiptRow>("select * from release_receipts where tenant_id=$1 and candidate_id=$2", [tenant, candidateId]);
   const policy = asObject<CompiledPolicy>(plan.compiled_policy_json);
   const verdicts = policy.requirements.map((requirement) => ({
     requirement,
     ...evaluateRequirement(requirement, evidence.map((e) => ({ evidenceKind: e.evidence_kind, outcome: e.outcome, independence: e.independence }))),
   }));
-  const semanticDiff = asObject<{ previousCapabilities?: Capability[]; addedCapabilities?: Capability[]; removedCapabilities?: Capability[] }>(candidate.semantic_diff_json);
+  const semanticDiff = asObject<SemanticDiff>(candidate.semantic_diff_json);
   return {
     candidate: { ...candidate, manifest_json: asObject<AgentManifest>(candidate.manifest_json), capabilities_json: asObject<Capability[]>(candidate.capabilities_json), policy_intent_json: asObject<PolicyIntent>(candidate.policy_intent_json), semantic_diff_json: semanticDiff },
     plan: { ...plan, compiled_policy_json: policy },
     trustTransition: summarizeTrustTransition(policy, semanticDiff),
-    evidence: evidence.map((e) => ({ ...e, payload_json: asObject(e.payload_json) })),
+    evidence: evidence.map((e) => ({ ...e, payload_json: jsonObject(e.payload_json) })),
     verdicts,
     gateReady: verdicts.every((v) => v.status === "pass"),
-    receipt: receipt ? { ...receipt, receipt_json: asObject(receipt.receipt_json) } : null,
+    receipt: receipt ? { ...receipt, receipt_json: jsonObject(receipt.receipt_json) } : null,
   };
 }
 
@@ -198,7 +227,7 @@ export async function proposeAdversarialChecks(userId: string, candidateId: stri
   const prompt = {
     artifactHash: candidate.artifact_hash,
     capabilities: asObject<Capability[]>(candidate.capabilities_json),
-    semanticDiff: asObject(candidate.semantic_diff_json),
+    semanticDiff: asObject<SemanticDiff>(candidate.semantic_diff_json),
     policy: { hash: plan.policy_hash, risk: policy.risk, requirements: policy.requirements.map((r) => ({ id: r.id, title: r.title, reason: r.reason })) },
   };
   const deterministic = deterministicAdversarialProposals(policy.requirements.map((r) => r.id)).slice(0, 6);
@@ -213,7 +242,15 @@ export async function proposeAdversarialChecks(userId: string, candidateId: stri
   try { parsed = JSON.parse(result.text); } catch {
     return { policyHash: plan.policy_hash, artifactHash: candidate.artifact_hash, provider: "deterministic-catalog", model: result.model, tests: deterministic, modelStatus: "invalid-json", boundary: "These are falsification proposals only. They cannot satisfy a blocking obligation or authorize release." };
   }
-  const modelTests = Array.isArray((parsed as { tests?: unknown[] })?.tests) ? (parsed as { tests: unknown[] }).tests.slice(0, 6) : [];
+  const modelTests = Array.isArray((parsed as { tests?: unknown[] })?.tests) ? (parsed as { tests: unknown[] }).tests.slice(0, 6).map((value) => {
+    const item = value && typeof value === "object" ? value as Record<string, unknown> : {};
+    return {
+      requirementId: String(item.requirementId ?? "").slice(0, 80),
+      title: String(item.title ?? "Adversarial test").slice(0, 160),
+      testIdea: String(item.testIdea ?? "").slice(0, 2000),
+      failureSignal: String(item.failureSignal ?? "").slice(0, 1000),
+    };
+  }) : [];
   const tests = modelTests.length ? modelTests : deterministic;
   return { policyHash: plan.policy_hash, artifactHash: candidate.artifact_hash, provider: result.provider, model: result.model, tests, deterministicFallback: deterministic, boundary: "Model output is a proposal only. It cannot satisfy a blocking obligation or authorize release." };
 }
@@ -235,7 +272,7 @@ export async function recordEvidence(userId: string, candidateId: string, input:
     if (input.evidenceKind === "formal_proof") throw new Error("Formal proof evidence requires a registered proof-verifier adapter; generic evidence submission cannot assert proof validity");
 
     const verifier = await resolveVerifierPrincipal(sql, tenant, authContext.verifierPrincipalId, input.evidenceKind);
-    let independence: Independence = verifier?.trustLevel ?? (userId === candidate.created_by ? "self" : "same_team");
+    const independence: Independence = verifier?.trustLevel ?? (userId === candidate.created_by ? "self" : "same_team");
     if (input.evidenceKind === "independent_verifier" && (!verifier || verifier.trustLevel !== "independent")) {
       throw new Error("Independent verifier evidence requires an active registered independent verifier principal bound to the API token");
     }
@@ -305,8 +342,8 @@ export async function decideRelease(userId: string, candidateId: string, expecte
         version: candidate.version,
         artifactHash: candidate.artifact_hash,
         creator: candidate.created_by,
-        capabilities: asObject(candidate.capabilities_json),
-        semanticDiff: asObject(candidate.semantic_diff_json),
+        capabilities: asObject<Capability[]>(candidate.capabilities_json),
+        semanticDiff: asObject<SemanticDiff>(candidate.semantic_diff_json),
       },
       policy: { id: plan.id, hash: plan.policy_hash, pack: policy.pack, packVersion: policy.packVersion, risk: policy.risk },
       requirements: requirementResults,
@@ -331,7 +368,7 @@ export async function decideRelease(userId: string, candidateId: string, expecte
 
 export async function getReceiptForCandidate(userId: string, candidateId: string, tenantOverride?: string) {
   const tenant = await resolveTenant(userId, tenantOverride); const sql = await getSql();
-  const [row] = await sql.query<Record<string, unknown>>(
+  const [row] = await sql.query<Pick<ReceiptRow, "receipt_json" | "receipt_hash" | "signer_id" | "signature_b64" | "public_key_fingerprint">>(
     `select rr.receipt_json,rr.receipt_hash,rr.signer_id,rr.signature_b64,rr.public_key_fingerprint
      from release_receipts rr join release_candidates c on c.id=rr.candidate_id
      where rr.tenant_id=$1 and rr.candidate_id=$2 and c.tenant_id=$1`, [tenant, candidateId],
@@ -339,22 +376,22 @@ export async function getReceiptForCandidate(userId: string, candidateId: string
   if (!row) throw new Error("Release receipt not found");
   return exportReceiptDocument({
     receipt_json: row.receipt_json,
-    receipt_hash: String(row.receipt_hash),
-    signer_id: String(row.signer_id),
-    signature_b64: String(row.signature_b64),
-    public_key_fingerprint: String(row.public_key_fingerprint),
+    receipt_hash: row.receipt_hash,
+    signer_id: row.signer_id,
+    signature_b64: row.signature_b64,
+    public_key_fingerprint: row.public_key_fingerprint,
   });
 }
 
 export async function listReceipts(userId: string) {
   const tenant = await tenantForUser(userId); const sql = await getSql();
-  const rows = await sql.query<Record<string, unknown>>(
+  const rows = await sql.query<ReceiptListRow>(
     `select rr.id,rr.verdict,rr.receipt_hash,rr.signer_id,rr.signature_b64,rr.public_key_fingerprint,rr.receipt_json,rr.created_at,
       c.version,c.artifact_hash,r.name as repository_name,r.slug as repository_slug
      from release_receipts rr join release_candidates c on c.id=rr.candidate_id join repositories r on r.id=c.repository_id
      where rr.tenant_id=$1 order by rr.created_at desc limit 200`, [tenant],
   );
-  return rows.map((r) => ({ ...r, receipt_json: asObject(r.receipt_json) }));
+  return rows.map((r) => ({ ...r, receipt_json: jsonObject(r.receipt_json) }));
 }
 
 export async function createDiscovery(userId: string, input: { repositoryId: string; parentId?: string; branch: string; title: string; claim: string; evidenceRefs?: string[] }) {
@@ -378,21 +415,22 @@ export async function createDiscovery(userId: string, input: { repositoryId: str
 
 export async function listDiscoveries(userId: string) {
   const tenant = await tenantForUser(userId); const sql = await getSql();
-  const rows = await sql.query<Record<string, unknown>>(
+  const rows = await sql.query<DiscoveryRow>(
     `select d.id,d.parent_id,d.branch,d.title,d.claim,d.status,d.content_hash,d.evidence_refs_json,d.created_by,d.created_at,r.name as repository_name,r.slug as repository_slug
      from discovery_commits d join repositories r on r.id=d.repository_id where d.tenant_id=$1 order by d.created_at desc limit 300`, [tenant],
   );
-  return rows.map((r) => ({ ...r, evidence_refs_json: asObject(r.evidence_refs_json) }));
+  return rows.map((r) => ({ ...r, evidence_refs_json: asObject<string[]>(r.evidence_refs_json) }));
 }
 
 export function exportReceiptDocument(row: { receipt_json: unknown; receipt_hash: string; signature_b64: string; signer_id: string; public_key_fingerprint: string }) {
+  const payload = jsonObject(row.receipt_json);
   return {
     schema: "hodgeform-signed-release/1",
-    payload: asObject(row.receipt_json),
+    payload,
     receiptHash: row.receipt_hash,
     signerId: row.signer_id,
     signature: row.signature_b64,
     publicKeyFingerprint: row.public_key_fingerprint,
-    canonicalPayload: canonicalize(asObject(row.receipt_json)),
+    canonicalPayload: canonicalize(payload),
   };
 }

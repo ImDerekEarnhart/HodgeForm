@@ -37,7 +37,7 @@ export const recordEvidence = createServerFn({ method: "POST" })
     candidateId: z.string().min(1).max(100), requirementId: z.string().min(1).max(80),
     evidenceKind: z.enum(["deterministic_test", "sandbox_run", "static_analysis", "llm_evaluation", "independent_verifier", "formal_proof", "human_approval"]),
     outcome: z.enum(["pass", "fail", "inconclusive"]),
-    source: z.string().min(1).max(160), payload: z.record(z.string(), z.unknown()).default({}),
+    source: z.string().min(1).max(160), payload: z.record(z.string(), z.json()).default({}),
   }).parse(input))
   .handler(async ({ data, context }) => (await import("./service.server")).recordEvidence(context.userId, data.candidateId, data));
 
@@ -72,7 +72,7 @@ export const removeWorkspaceMember = createServerFn({ method: "POST" }).middlewa
 export const verifyPublishedReceipt = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({
     schema: z.literal("hodgeform-signed-release/1"),
-    payload: z.record(z.string(), z.unknown()),
+    payload: z.record(z.string(), z.json()),
     receiptHash: z.string().regex(/^[a-fA-F0-9]{64}$/),
     signerId: z.string().min(1).max(200).optional(),
     signature: z.string().min(20).max(2000),

@@ -1,41 +1,54 @@
-# HodgeForm 1.1 Trust Compiler — release verification status
+# HodgeForm 1.1.1 controlled-beta verification status
 
-This file describes evidence gathered against this exact source tree during the 2026-09-04 finalization session. It is not a penetration-test report, legal certification, or universal safety proof.
+This record covers the 2026-09-04 release finalization. It is not a penetration-test report,
+legal certification, customer-traction proof, or universal safety claim.
 
-## Passed in this environment
+## Source provenance
 
-- Deterministic product/security suite: **62/62 PASS** after the 1.1 trust-compiler upgrades.
-- Trust-boundary demo: **PASS** — artifact mutation, missing independent evidence, LLM-only PASS, and creator self-approval all produce BLOCK; restored admissible evidence reaches the RELEASE path.
-- TrustBench 0.1: **10/10 authority/obligation fixtures exact** and **4/4 evidence-admissibility fixtures exact**.
-- TypeScript syntax/transpile audit: **60 TS/TSX files, 0 diagnostics**.
-- Static source security scan: **PASS**.
-- Brand/product smoke: **PASS**.
-- Golden onboarding smoke: **PASS**, two policy-intent lines in the fixture.
-- Python reference executor compilation: **PASS**.
+- Immutable 1.1 source archive SHA-256:
+  `6FD4184E8C318C66C0CCBF089C55C076CB8B1118AB1048581D199F2409E3A21B`.
+- Archive manifest verification: **144/144 expected files present and matching**, with no
+  unlisted source files.
+- The staged 1.1.1 tree adds release hardening and a patch version only; it does not replace
+  the verified 1.1 provenance baseline.
 
-## Material 1.1 trust improvements
+## Local evidence gathered before final metadata freeze
 
-- Independent evidence requires a registered verifier principal rather than a caller-selected label.
-- Verifier principals carry server-managed trust level and allowed evidence kinds.
-- Machine tokens are explicitly scoped and may be bound to a verifier principal; no machine approval scope exists.
-- Every newly recorded evidence receipt is server-bound to the exact candidate, artifact digest, frozen policy hash, requirement ID, token identity, and verifier identity before hashing.
-- Candidate inspection exposes a first-class Trust Transition view: what changed, what must be proven, what evidence counts, and who may approve.
-- `hodgeform demo`, `hodgeform benchmark`, and `hodgeform gate explain` make the trust boundary inspectable from the CLI.
+- Fresh Node 22 dependency installation: **PASS**, 296 packages, 0 reported vulnerabilities.
+- Dependency audit: `npm audit --omit=dev --audit-level=high` — **0 vulnerabilities**.
+- TypeScript check: **PASS**.
+- Expanded lint (source, tests, scripts, CLI, Vite config): **PASS**.
+- Deterministic product/security suite: **64/64 PASS**. The Windows test command was corrected
+  so this is a real executed suite rather than a zero-test false green result.
+- Trust-boundary demo: **PASS** — artifact mutation, missing independent evidence, LLM-only
+  PASS, and creator self-approval all BLOCK; the restored admissible path RELEASEs.
+- TrustBench 0.1: **10/10 authority/obligation fixtures exact** and **4/4 evidence-admissibility
+  fixtures exact**.
+- Brand/product smoke, golden onboarding smoke, static source security scan, Vite/Nitro build,
+  and Python reference-executor compilation: **PASS**.
+- Local HTTP/header pass: public, auth, workspace, gate, verifier, legal, liveness, and
+  readiness routes returned expected responses; rendered landing, verifier, overview, and
+  gates screens were visually inspected.
 
-## Not established in this container
+## Final gate still required
 
-A fresh dependency-backed production build is still not honestly established here. `npm ci` did not complete in this container (the process stalled until the tool transport timeout), so this session does **not** claim a fresh `npm ci -> typecheck -> lint -> Vite/Nitro build -> Docker build` pass for the exact 1.1 tree.
+The system `C:` drive filled while the staged 1.1.1 copy was being prepared. Therefore this
+file does **not** claim a new one-command `npm ci -> npm run release:check` proof for the final
+version-metadata-only staged tree. The canonical GitHub Actions release job is required to
+establish that clean proof, including real PostgreSQL, auth lifecycle, backup/restore, Compose,
+image build, and executor-isolation checks.
 
-The included GitHub release workflow remains the authoritative place to execute those network/dependency-backed gates plus real PostgreSQL, auth HTTP lifecycle, backup/restore, executor-container, CodeQL, Trivy, and image scans on a normal runner.
+See [`docs/SHIP_CHECKLIST.md`](docs/SHIP_CHECKLIST.md) for the exact remaining release gates.
 
-External gates still required before broad public GA:
+## External gates before public GA
 
-- deployment against the actual managed PostgreSQL service selected for production;
-- real production transactional-email/domain configuration;
+- managed-production deployment, HTTPS domain, transactional email, backup/PITR configuration;
 - independent security/penetration review;
-- legal review of terms/privacy/retention claims;
-- an uncoached human onboarding study for the under-10-minute promise.
+- legal review of deployed terms, privacy, and retention statements;
+- uncoached customer onboarding and adoption evidence.
 
 ## Release semantics
 
-A HodgeForm receipt means that the exact artifact identified in the receipt satisfied the exact frozen HodgeForm gate using the recorded admissible evidence and approval identity. It does not mean the artifact is universally safe, correct, compliant, or fit for every context.
+A HodgeForm receipt means that the exact artifact identified in the receipt satisfied the exact
+frozen HodgeForm gate using the recorded admissible evidence and approval identity. It does not
+mean the artifact is universally safe, correct, compliant, or fit for every context.

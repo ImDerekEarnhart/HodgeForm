@@ -48,7 +48,22 @@ async function getEmbedded(): Promise<import("@electric-sql/pglite").PGlite> {
   })();
   const pg = await globalRef.__hfPglitePromise__;
   const migrate = async () => {
-    const migrations = import.meta.glob("/migrations/*.sql", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+    let migrations: Record<string, string>;
+    if (typeof import.meta.glob === "function") {
+      migrations = import.meta.glob("/migrations/*.sql", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+    } else {
+      // Direct Node-based integration tests do not provide Vite's import.meta.glob.
+      // Load the same source-controlled migration directory without changing the
+      // basename-based migration ledger used in production.
+      const { readdir, readFile } = await import("node:fs/promises");
+      const directory = new URL("../../migrations/", import.meta.url);
+      migrations = Object.fromEntries(await Promise.all(
+        (await readdir(directory)).filter((name) => name.endsWith(".sql")).map(async (name) => [
+          `/migrations/${name}`,
+          await readFile(new URL(name, directory), "utf8"),
+        ]),
+      ));
+    }
     const applied = (await pg.query<{ name: string }>("select name from _migrations")).rows.map((r) => r.name);
     for (const { name, path } of pendingMigrations(Object.keys(migrations), applied)) {
       await pg.transaction(async (tx) => {
@@ -69,10 +84,10 @@ export function getSql(): Promise<Sql> {
   sqlPromise ??= (async () => {
     if (dbSource === "postgres") {
       const pool = await getPool();
-      return toSql(async <T>(text, params) => (await pool.query(text, params)).rows as T[]);
+      return toSql(async <T>(text: string, params: unknown[]) => (await pool.query(text, params)).rows as T[]);
     }
     const pg = await getEmbedded();
-    return toSql(async <T>(text, params) => (await pg.query<T>(text, params)).rows);
+    return toSql(async <T>(text: string, params: unknown[]) => (await pg.query<T>(text, params)).rows);
   })().catch((error) => { sqlPromise = null; throw error; });
   return sqlPromise;
 }
@@ -84,7 +99,7 @@ export async function withTransaction<T>(fn: (sql: Sql) => Promise<T>): Promise<
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
-      const sql = toSql(async <R>(text, params) => (await client.query(text, params)).rows as R[]);
+      const sql = toSql(async <R>(text: string, params: unknown[]) => (await client.query(text, params)).rows as R[]);
       const result = await fn(sql);
       await client.query("COMMIT");
       return result;
@@ -97,7 +112,7 @@ export async function withTransaction<T>(fn: (sql: Sql) => Promise<T>): Promise<
   }
   const pg = await getEmbedded();
   return pg.transaction(async (tx) => {
-    const sql = toSql(async <R>(text, params) => (await tx.query<R>(text, params)).rows);
+    const sql = toSql(async <R>(text: string, params: unknown[]) => (await tx.query<R>(text, params)).rows);
     return fn(sql);
   });
 }

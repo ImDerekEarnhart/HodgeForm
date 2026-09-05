@@ -23,3 +23,16 @@ test("operator docs cover backup restore migrations rollback and key compromise"
   for (const phrase of ["Back up", "migrations", "Rollback", "restore"]) assert.match(ops, new RegExp(phrase, "i"));
   for (const phrase of ["signing-key compromise", "rotate", "tenant-boundary"]) assert.match(incident, new RegExp(phrase, "i"));
 });
+
+test("invite-only beta has a guarded first-operator procedure", async () => {
+  const [script, workflow] = await Promise.all([
+    readFile(new URL("../scripts/provision-operator.mjs", import.meta.url), "utf8"),
+    readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8"),
+  ]);
+  assert.match(script, /HODGEFORM_OPERATOR_PASSWORD/);
+  assert.match(script, /PROVISION_OPERATOR:/);
+  assert.match(script, /emailVerified[^\n]*true/);
+  assert.doesNotMatch(script, /process\.argv\[[^\]]+\][^\n]*password/i);
+  assert.match(ops, /Controlled-beta operator provisioning/);
+  assert.match(workflow, /operator-provisioning-smoke\.mjs/);
+});

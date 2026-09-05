@@ -41,6 +41,19 @@ For managed PostgreSQL, also enable the provider's automated backups, point-in-t
 7. Verify login, workspace isolation, candidate creation, evidence submission and offline receipt verification.
 8. Watch 4xx/5xx rate, readiness failures, DB pool errors, email delivery failures, executor failures and gate latency.
 
+## Controlled-beta operator provisioning
+
+Keep `HODGEFORM_RELEASE_CHANNEL=controlled_beta` and `HODGEFORM_ALLOW_SIGNUPS=false` until the public-GA gates are complete. After migrations, create the first verified owner without opening public signup. Supply the password only through the secret environment (never as a command-line argument):
+
+```sh
+export HODGEFORM_OPERATOR_PASSWORD='use-a-password-manager-generated-secret'
+export HODGEFORM_OPERATOR_CONFIRM='PROVISION_OPERATOR:operator@example.com'
+npm run operator:provision -- operator@example.com "Operator name"
+unset HODGEFORM_OPERATOR_PASSWORD HODGEFORM_OPERATOR_CONFIRM
+```
+
+The command refuses duplicate accounts and creates an owner workspace in SaaS mode. Use the normal password-reset flow for existing users and `scripts/admin-owner-recovery.mjs` only for the documented break-glass ownership case.
+
 ## Rollback
 
 Application rollback should normally roll back the image while leaving forward-compatible schema changes in place. Never automatically reverse a destructive migration. For an incompatible migration, use the documented migration-specific rollback/restore procedure and preserve release/evidence records.

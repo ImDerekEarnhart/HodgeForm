@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 const read=(p)=>readFileSync(new URL(`../${p}`,import.meta.url),"utf8");
 
 test("verifier registry makes independent evidence an authenticated principal property",()=>{
@@ -43,7 +44,7 @@ test("candidate response and UI expose the four-part trust transition explanatio
 
 test("CLI ships a reproducible fail-closed demo and TrustBench",()=>{
   for(const cmd of ["demo","benchmark"]){
-    const r=spawnSync(process.execPath,[new URL("../bin/hodgeform.mjs",import.meta.url).pathname,cmd],{encoding:"utf8"});
+    const r=spawnSync(process.execPath,[fileURLToPath(new URL("../bin/hodgeform.mjs",import.meta.url)),cmd],{encoding:"utf8"});
     assert.equal(r.status,0,`${cmd} failed: ${r.stderr}`);
     if(cmd==="demo"){assert.match(r.stdout,/BLOCK\s+artifact changed after evaluation/);assert.match(r.stdout,/RELEASE\s+restored admissible evidence/);}else{assert.match(r.stdout,/"authorityObligationAccuracy": 1/);assert.match(r.stdout,/"evidenceAdmissibilityAccuracy": 1/);}
   }

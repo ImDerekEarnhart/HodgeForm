@@ -18,7 +18,7 @@ export const ALL_API_SCOPES: ApiScope[] = [
 function parseScopes(value: unknown): ApiScope[] {
   let values: unknown[] = [];
   if (Array.isArray(value)) values = value;
-  else if (typeof value === "string") { try { const p = JSON.parse(value); if (Array.isArray(p)) values = p; } catch {} }
+  else if (typeof value === "string") { try { const p = JSON.parse(value); if (Array.isArray(p)) values = p; } catch { values = []; } }
   const allowed = new Set(ALL_API_SCOPES);
   return [...new Set(values.map(String).filter((v): v is ApiScope => allowed.has(v as ApiScope)))];
 }
@@ -55,7 +55,7 @@ export async function listApiTokens(userId: string) {
      from api_tokens t left join verifier_principals v on v.id=t.verifier_principal_id and v.tenant_id=t.tenant_id
      where t.tenant_id=$1 and t.user_id=$2 and t.revoked_at is null order by t.created_at desc`, [tenant, userId],
   );
-  return rows.map((r) => ({ ...r, scopes: parseScopes(r.scopes_json) }));
+  return rows.map(({ scopes_json, ...row }) => ({ ...row, scopes: parseScopes(scopes_json) }));
 }
 
 export async function revokeApiToken(userId: string, tokenId: string) {

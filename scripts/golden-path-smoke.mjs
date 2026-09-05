@@ -4,7 +4,8 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-const root=resolve(new URL("..",import.meta.url).pathname); const dir=await mkdtemp(join(tmpdir(),"hodgeform-golden-"));
+import { fileURLToPath } from "node:url";
+const root=resolve(fileURLToPath(new URL("..",import.meta.url))); const dir=await mkdtemp(join(tmpdir(),"hodgeform-golden-"));
 const started=performance.now();
 try{
   await mkdir(join(dir,"src"));

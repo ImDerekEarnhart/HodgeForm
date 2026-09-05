@@ -141,14 +141,27 @@ The **Propose tests** action in a frozen gate can ask the configured local model
 ## Production deployment
 
 1. Copy `.env.production.example` to your secret-management system. Do **not** commit secrets.
-2. Generate the Ed25519 release-authority keypair and separately pin the public key in CI.
-3. Configure transactional email before enabling public signup.
-4. Set a real domain and long random Postgres/Auth secrets.
+2. Keep `HODGEFORM_RELEASE_CHANNEL=controlled_beta` and `HODGEFORM_ALLOW_SIGNUPS=false` for an invite-only beta.
+3. Generate the Ed25519 release-authority keypair and separately pin the public key in CI.
+4. Set a real domain, legal/contact/retention settings, and long random Postgres/Auth secrets.
 5. Run:
 
 ```bash
 docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
 ```
+
+After migrations, provision the first verified owner without opening signup. The password is
+read only from the secret environment; see [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
+
+```bash
+export HODGEFORM_OPERATOR_PASSWORD='use-a-password-manager-generated-secret'
+export HODGEFORM_OPERATOR_CONFIRM='PROVISION_OPERATOR:operator@example.com'
+npm run operator:provision -- operator@example.com "Operator name"
+unset HODGEFORM_OPERATOR_PASSWORD HODGEFORM_OPERATOR_CONFIRM
+```
+
+`public_ga` is a separate promotion: it requires an explicit legal-review acknowledgement and
+the independent external gates listed in [`docs/SHIP_CHECKLIST.md`](docs/SHIP_CHECKLIST.md).
 
 Local model serving is optional:
 

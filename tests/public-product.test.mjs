@@ -8,10 +8,19 @@ const pages = await readFile(new URL("../src/lib/ops/public-pages.server.ts", im
 const compose = await readFile(new URL("../docker-compose.production.yml", import.meta.url), "utf8");
 
 test("public launch requires operator contacts retention and legal review acknowledgement", () => {
-  for (const key of ["HODGEFORM_LEGAL_ENTITY_NAME","HODGEFORM_SUPPORT_EMAIL","HODGEFORM_SECURITY_EMAIL","HODGEFORM_PRIVACY_EMAIL","HODGEFORM_DATA_RETENTION_DAYS","HODGEFORM_LEGAL_REVIEWED"]) {
+  for (const key of ["HODGEFORM_LEGAL_ENTITY_NAME","HODGEFORM_LEGAL_EFFECTIVE_DATE","HODGEFORM_SUPPORT_EMAIL","HODGEFORM_SECURITY_EMAIL","HODGEFORM_PRIVACY_EMAIL","HODGEFORM_DATA_RETENTION_DAYS","HODGEFORM_LEGAL_REVIEWED"]) {
     assert.match(config, new RegExp(key));
     assert.match(compose, new RegExp(key));
   }
+});
+
+test("controlled beta stays production-safe without impersonating public GA", () => {
+  assert.match(config, /controlled_beta/);
+  assert.match(config, /public_ga/);
+  assert.match(config, /controlled beta must keep HODGEFORM_ALLOW_SIGNUPS=false/);
+  assert.match(config, /channel === "public_ga"[\s\S]*HODGEFORM_LEGAL_REVIEWED/);
+  assert.match(compose, /HODGEFORM_RELEASE_CHANNEL:[^\n]*controlled_beta/);
+  assert.match(compose, /HODGEFORM_ALLOW_SIGNUPS:[^\n]*false/);
 });
 
 test("public pages state the receipt boundary and vulnerability contact", () => {

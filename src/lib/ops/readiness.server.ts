@@ -20,9 +20,9 @@ export async function readinessStatus(): Promise<ReadinessResult> {
     issues.push("database connectivity check failed");
   }
   return {
-    ready: (!config.publicRelease || config.ready) && database === "ok",
-    release: "1.1.0",
-    checks: { config: config.ready || !config.publicRelease ? "ok" : "fail", database },
+    ready: (!config.enforced || config.ready) && database === "ok",
+    release: "1.1.1",
+    checks: { config: config.ready || !config.enforced ? "ok" : "fail", database },
     issues,
   };
 }

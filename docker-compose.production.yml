@@ -35,10 +35,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      HODGEFORM_PUBLIC_RELEASE: "true"
+      HODGEFORM_RELEASE_CHANNEL: ${HODGEFORM_RELEASE_CHANNEL:-controlled_beta}
       VITE_AUTH_ENABLED: "true"
       HODGEFORM_EMAIL_PASSWORD_AUTH: "true"
-      HODGEFORM_ALLOW_SIGNUPS: ${HODGEFORM_ALLOW_SIGNUPS:-true}
+      HODGEFORM_ALLOW_SIGNUPS: ${HODGEFORM_ALLOW_SIGNUPS:-false}
       HODGEFORM_EMAIL_PROVIDER: ${HODGEFORM_EMAIL_PROVIDER:-resend}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       HODGEFORM_EMAIL_FROM: ${HODGEFORM_EMAIL_FROM:-}
@@ -80,13 +80,6 @@ services:
     environment:
       HODGEFORM_SANDBOX_SOCKET: /runtime/sandbox/sandbox.sock
       HODGEFORM_SANDBOX_TOKEN: ${HODGEFORM_SANDBOX_TOKEN:?set a random sandbox service token}
-      HODGEFORM_LEGAL_ENTITY_NAME: ${HODGEFORM_LEGAL_ENTITY_NAME:?set legal entity name}
-      HODGEFORM_LEGAL_EFFECTIVE_DATE: ${HODGEFORM_LEGAL_EFFECTIVE_DATE:?set legal effective date}
-      HODGEFORM_SUPPORT_EMAIL: ${HODGEFORM_SUPPORT_EMAIL:?set support email}
-      HODGEFORM_SECURITY_EMAIL: ${HODGEFORM_SECURITY_EMAIL:?set security email}
-      HODGEFORM_PRIVACY_EMAIL: ${HODGEFORM_PRIVACY_EMAIL:?set privacy email}
-      HODGEFORM_DATA_RETENTION_DAYS: ${HODGEFORM_DATA_RETENTION_DAYS:-30}
-      HODGEFORM_LEGAL_REVIEWED: ${HODGEFORM_LEGAL_REVIEWED:?set true only after qualified legal review}
     volumes: ["sandbox-socket:/runtime/sandbox"]
     read_only: true
     tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]

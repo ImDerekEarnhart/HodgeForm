@@ -19,6 +19,7 @@ export type Independence = "self" | "same_team" | "independent" | "formal";
 export type VerifierTrust = "same_team" | "independent";
 export type ApiScope = "repository:read" | "repository:write" | "candidate:read" | "candidate:write" | "evidence:write" | "receipt:read";
 export type Outcome = "pass" | "fail" | "inconclusive";
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 export type Requirement = {
   id: string;
@@ -74,7 +75,7 @@ export type EvidenceInput = {
   evidenceKind: EvidenceKind;
   outcome: Outcome;
   source: string;
-  payload: Record<string, unknown>;
+  payload: Record<string, JsonValue>;
 };
 
 export type VerifierPrincipal = {

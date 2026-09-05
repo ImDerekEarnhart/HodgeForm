@@ -39,6 +39,8 @@ jobs:
       - run: npm run release:check
       - run: python -m py_compile executor/server.py
       - run: npm run db:migrate
+      - name: Invite-only operator provisioning smoke
+        run: node scripts/operator-provisioning-smoke.mjs
       - name: Real Postgres + HTTP tenant/API integration
         run: node scripts/postgres-http-integration.mjs
       - name: Auth lifecycle HTTP integration

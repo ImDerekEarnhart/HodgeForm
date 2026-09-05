@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.1 — Controlled-beta release hardening
+
+### Fixed
+
+- Windows release test discovery now runs the actual test suite instead of silently matching zero tests.
+- Windows file URL handling in the onboarding, trust-compiler, and golden-path checks.
+- Liveness/readiness separation: `/api/health` is always cheap liveness while `/api/ready` performs the configuration and database gate.
+
+### Added
+
+- Explicit `development`, `controlled_beta`, and `public_ga` release channels. Production defaults to closed controlled beta.
+- A guarded first-operator provisioning command and PostgreSQL smoke coverage.
+- Production configuration checks for HTTPS, signing keys, retention/contact data, invite-only signup, and public-GA acknowledgement.
+
 ## 1.1.0 — Trust Compiler
 
 This release sharpens HodgeForm around the product's core epistemic boundary rather than adding general AI features.

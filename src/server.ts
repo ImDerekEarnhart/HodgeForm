@@ -31,7 +31,7 @@ export default createServerEntry({
         return response;
       }
       if (url.pathname === "/api/health") {
-        const response = harden(Response.json({ status: "ok", release: "1.1.0" }), id);
+        const response = harden(Response.json({ status: "ok", release: "1.1.1" }), id);
         logEvent("info", "http_request", { request_id: id, method: request.method, path: url.pathname, status: 200, duration_ms: Date.now() - started });
         return response;
       }
@@ -43,7 +43,7 @@ export default createServerEntry({
         return response;
       }
       const config = publicReleaseConfig();
-      if (config.publicRelease && !config.ready) {
+      if (config.enforced && !config.ready) {
         const response = harden(Response.json({ error: "HodgeForm is refusing traffic because production configuration is unsafe." }, { status: 503 }), id);
         logEvent("error", "unsafe_production_config", { request_id: id, method: request.method, path: url.pathname, issues: config.issues, status: 503, duration_ms: Date.now() - started });
         return response;
