@@ -8,6 +8,7 @@ import { useAsync } from "@/lib/use-async";
 import { Page, Card, CardHeader, Empty } from "@/components/page";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
+import { ExperimentPanel } from "@/components/experiment-panel";
 import { Status, Hash } from "@/components/status";
 
 export const Route = createFileRoute("/discoveries")({ component: () => <RequireUser><Discoveries /></RequireUser> });
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/discoveries")({ component: () => <Require
 function Discoveries() {
   const commits = useAsync(() => listDiscoveries());
   const repos = useAsync(() => listRepositories());
+  const [selected,setSelected]=useState<string|null>(null);
   const [open, setOpen] = useState(false);
   const [repo, setRepo] = useState("");
   const [parent, setParent] = useState("");
@@ -68,6 +70,7 @@ function Discoveries() {
         <div className="md:col-span-2"><Button disabled={busy || repos.loading || !repositoryId}>{busy ? "Committing…" : "Create immutable commit"}</Button></div>
       </form>
     </Card>}
+    {commits.data?.find(c=>c.id===selected) && <ExperimentPanel key={selected} discovery={commits.data.find(c=>c.id===selected)!}/>}
     {commits.loading ? <p role="status" className="text-sm text-muted">Loading discovery commits…</p> : commits.data?.length ? <div className="space-y-3">{commits.data.map((commit) => <Card key={commit.id} className="p-4">
       <div className="flex items-start justify-between gap-4"><div className="min-w-0">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.13em] text-subtle"><GitBranch className="size-3" />{commit.repository_name} / {commit.branch}</div>
@@ -75,7 +78,7 @@ function Discoveries() {
         <p className="mt-2 max-w-4xl whitespace-pre-wrap break-words text-sm leading-6 text-muted">{commit.claim}</p>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-subtle"><Hash value={commit.content_hash} chars={16} />{commit.parent_id && <span>parent <Hash value={commit.parent_id} chars={8} /></span>}</div>
         {commit.evidence_refs_json.length > 0 && <details className="mt-3 text-xs text-muted"><summary className="cursor-pointer">Cited evidence ({commit.evidence_refs_json.length})</summary><ul className="mt-2 space-y-1">{commit.evidence_refs_json.map((reference) => <li key={reference} className="break-all font-mono">{reference}</li>)}</ul></details>}
-      </div><Status value={commit.status} /></div>
+      </div><div className="space-y-3 text-right"><Status value={commit.status}/><div><Button variant="secondary" onClick={()=>setSelected(commit.id)}>Govern experiment</Button></div></div></div>
     </Card>)}</div> : !problem && <Empty title="No discovery commits" text="Commit a bounded claim, a proposed operator, or a negative result with its evidence and parent lineage." />}
   </Page>;
 }

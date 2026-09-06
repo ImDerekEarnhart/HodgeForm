@@ -44,6 +44,7 @@ export type AgentManifest = {
   artifactUri?: string;
   capabilities: Capability[];
   metadata?: Record<string, string>;
+  components?: import("./change-intelligence").Component[];
 };
 
 export type CompiledPolicy = {

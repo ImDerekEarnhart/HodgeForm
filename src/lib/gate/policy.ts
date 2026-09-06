@@ -91,13 +91,26 @@ export function compilePolicy(input: { intent: PolicyIntent; capabilities: Capab
   };
 }
 
-export function evaluateRequirement(requirement: Requirement, evidence: { evidenceKind: string; outcome: string; independence: Independence }[]) {
-  const eligible = evidence.filter((e) => requirement.allowedEvidence.includes(e.evidenceKind as never) && independenceSatisfies(e.independence, requirement.minimumIndependence));
+export type RequirementEvidence = { id?: string; requirementId: string; evidenceKind: string; outcome: string; independence: Independence };
+
+export function evaluateRequirement(requirement: Requirement, evidence: RequirementEvidence[]) {
+  const assessments = evidence.map((e) => {
+    const reason = e.requirementId !== requirement.id ? "different_obligation"
+      : !requirement.allowedEvidence.includes(e.evidenceKind as never) ? "inadmissible_kind"
+      : !independenceSatisfies(e.independence, requirement.minimumIndependence) ? "insufficient_independence"
+      : e.outcome === "fail" ? "counterexample"
+      : e.outcome !== "pass" ? "inconclusive"
+      : e.evidenceKind === "llm_evaluation" ? "model_pass_is_not_authority" : "satisfies";
+    return { evidenceId: e.id ?? null, requirementId: e.requirementId, reason };
+  });
+  // Scope is checked inside the evaluator, so no caller can accidentally pool
+  // artifact-integrity evidence into regression or other independent obligations.
+  const eligible = evidence.filter((e) => e.requirementId === requirement.id && requirement.allowedEvidence.includes(e.evidenceKind as never) && independenceSatisfies(e.independence, requirement.minimumIndependence));
   const failed = eligible.some((e) => e.outcome === "fail");
   // LLMs may discover counterexamples, but a probabilistic judge can never be the sole
   // authority that satisfies a blocking release obligation. Models propose evidence; policy decides.
   const passed = eligible.some((e) => e.outcome === "pass" && e.evidenceKind !== "llm_evaluation");
-  return { eligibleCount: eligible.length, status: failed ? "fail" as const : passed ? "pass" as const : "missing" as const };
+  return { assessments, eligibleCount: eligible.length, status: failed ? "fail" as const : passed ? "pass" as const : "missing" as const };
 }
 
 export function summarizeTrustTransition(policy: CompiledPolicy, semanticDiff: { removedCapabilities?: Capability[] } = {}): TrustTransitionSummary {

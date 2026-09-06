@@ -10,6 +10,9 @@ import { teacherChat } from "@/lib/runtime/model-provider.server";
 import { deterministicAdversarialProposals } from "./falsifiers";
 import { resolveVerifierPrincipal } from "./verifiers.server";
 import { validateDiscoveryEvidence } from "./discovery-evidence";
+import { compareComponents, componentObligations, type ComponentChange } from "./change-intelligence";
+import { candidateExperimentReadiness } from "./experiments.server";
+import { candidateSchema } from "./candidate-schema";
 
 function id(prefix: string) { return `${prefix}_${randomUUID().replaceAll("-", "")}`; }
 function slugify(value: string) { return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "repo"; }
@@ -37,7 +40,7 @@ type CandidateRow = {
 };
 type PlanRow = { id: string; candidate_id: string; compiled_policy_json: unknown; policy_hash: string; pack_id: string; pack_version: number };
 type EvidenceRow = { id: string; requirement_id: string; evidence_kind: string; outcome: string; independence: Independence; source: string; payload_hash: string; payload_json: unknown; verifier_principal_id?: string | null; created_by: string; created_at: string };
-type SemanticDiff = { previousCapabilities: Capability[]; addedCapabilities: Capability[]; removedCapabilities: Capability[] };
+type SemanticDiff = { previousCapabilities: Capability[]; addedCapabilities: Capability[]; removedCapabilities: Capability[]; components?: ComponentChange[]; basis?: string };
 type OverviewCandidateRow = {
   id: string; version: string; status: string; risk: Risk; artifact_hash: string; created_at: string;
   repository_name: string; repository_slug: string; policy_hash: string | null; compiled_policy_json: unknown;
@@ -144,6 +147,7 @@ export async function listCandidates(userId: string, repositoryId?: string, tena
 }
 
 export async function createCandidate(userId: string, input: { repositoryId: string; version: string; artifactHash: string; manifest: AgentManifest; intent: PolicyIntent }, tenantOverride?: string) {
+  input = candidateSchema.parse(input);
   enforceAgentRateLimit(userId);
   assertPublicReleaseReady();
   const tenant = await resolveTenant(userId, tenantOverride);
@@ -153,14 +157,19 @@ export async function createCandidate(userId: string, input: { repositoryId: str
   const capabilities = [...new Set(input.manifest.capabilities)].sort() as Capability[];
   return withTransaction(async (sql) => {
     await requireRepo(sql, tenant, input.repositoryId);
-    const previous = await sql.query<{ capabilities_json: unknown }>(
-      `select capabilities_json from release_candidates where tenant_id=$1 and repository_id=$2 and status='released' order by created_at desc limit 1`, [tenant, input.repositoryId],
+    const previous = await sql.query<{ capabilities_json: unknown; manifest_json: unknown }>(
+      `select capabilities_json,manifest_json from release_candidates where tenant_id=$1 and repository_id=$2 and status='released' order by created_at desc,id desc limit 1`, [tenant, input.repositoryId],
     );
     const previousCapabilities = previous[0] ? asObject<Capability[]>(previous[0].capabilities_json) : [];
-    const policy = compilePolicy({ intent: input.intent, capabilities, previousCapabilities, ...organizationPolicyOverlay() });
+    const previousManifest = previous[0] ? asObject<AgentManifest>(previous[0].manifest_json) : null;
+    const components = compareComponents(previousManifest?.components, input.manifest.components);
+    const overlay = organizationPolicyOverlay();
+    const policy = compilePolicy({ intent: input.intent, capabilities, previousCapabilities,
+      ...overlay, organizationRequirements: componentObligations(components),
+      forceSeparateApprover: overlay.forceSeparateApprover || components.length > 0 });
     const policyHash = sha256(policy);
     const candidateId = id("cand");
-    const semanticDiff = { previousCapabilities, addedCapabilities: policy.addedCapabilities, removedCapabilities: previousCapabilities.filter((c) => !capabilities.includes(c)) };
+    const semanticDiff = { previousCapabilities, addedCapabilities: policy.addedCapabilities, removedCapabilities: previousCapabilities.filter((c) => !capabilities.includes(c)), components, basis: "declared_content_addressed_contracts_not_whole_program_proof" };
     await sql.query(
       `insert into release_candidates(id,tenant_id,repository_id,version,artifact_hash,manifest_json,capabilities_json,policy_intent_json,semantic_diff_json,risk,status,created_by)
        values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10,'frozen',$11)`,
@@ -202,8 +211,9 @@ export async function getCandidate(userId: string, candidateId: string, tenantOv
   const policy = asObject<CompiledPolicy>(plan.compiled_policy_json);
   const verdicts = policy.requirements.map((requirement) => ({
     requirement,
-    ...evaluateRequirement(requirement, evidence.map((e) => ({ evidenceKind: e.evidence_kind, outcome: e.outcome, independence: e.independence }))),
+    ...evaluateRequirement(requirement, evidence.map((e) => ({ id: e.id, requirementId: e.requirement_id, evidenceKind: e.evidence_kind, outcome: e.outcome, independence: e.independence }))),
   }));
+  const experiments = await candidateExperimentReadiness(sql,tenant,candidateId);
   const semanticDiff = asObject<SemanticDiff>(candidate.semantic_diff_json);
   return {
     candidate: { ...candidate, manifest_json: asObject<AgentManifest>(candidate.manifest_json), capabilities_json: asObject<Capability[]>(candidate.capabilities_json), policy_intent_json: asObject<PolicyIntent>(candidate.policy_intent_json), semantic_diff_json: semanticDiff },
@@ -211,7 +221,8 @@ export async function getCandidate(userId: string, candidateId: string, tenantOv
     trustTransition: summarizeTrustTransition(policy, semanticDiff),
     evidence: evidence.map((e) => ({ ...e, payload_json: jsonObject(e.payload_json) })),
     verdicts,
-    gateReady: verdicts.every((v) => v.status === "pass"),
+    experiments,
+    gateReady: verdicts.every((v) => v.status === "pass") && experiments.every(e=>e.status==="survived"),
     receipt: receipt ? { ...receipt, receipt_json: jsonObject(receipt.receipt_json) } : null,
   };
 }
@@ -260,7 +271,12 @@ export async function recordEvidence(userId: string, candidateId: string, input:
   enforceAgentRateLimit(userId);
   assertPublicReleaseReady();
   const tenant = await resolveTenant(userId, tenantOverride);
-  return withTransaction(async (sql) => {
+  return withTransaction(sql => persistEvidence(sql, userId, tenant, candidateId, input, authContext));
+}
+
+// Only authenticated server adapters may set execution provenance. HTTP evidence
+// payloads cannot choose this flag, identity, or the frozen binding.
+export async function persistEvidence(sql: Sql, userId: string, tenant: string, candidateId: string, input: EvidenceInput, authContext: EvidenceAuthContext = {}, attestationVerified = false) {
     const [candidate] = await sql.query<CandidateRow>("select * from release_candidates where tenant_id=$1 and id=$2 for update", [tenant, candidateId]);
     if (!candidate) throw new Error("Candidate not found");
     if (candidate.status !== "frozen") throw new Error("Evidence can only be attached to a frozen candidate");
@@ -302,12 +318,11 @@ export async function recordEvidence(userId: string, candidateId: string, input:
     const payloadHash = sha256(payload);
     const evidenceId = id("evidence");
     await sql.query(
-      `insert into evidence_receipts(id,tenant_id,candidate_id,requirement_id,evidence_kind,outcome,independence,source,payload_json,payload_hash,created_by,verifier_principal_id)
-       values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10,$11,$12)`,
-      [evidenceId, tenant, candidateId, requirement.id, input.evidenceKind, groundedOutcome, independence, source, JSON.stringify(payload), payloadHash, userId, verifier?.id ?? null],
+      `insert into evidence_receipts(id,tenant_id,candidate_id,requirement_id,evidence_kind,outcome,independence,source,payload_json,payload_hash,created_by,verifier_principal_id,attestation_verified)
+       values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10,$11,$12,$13)`,
+      [evidenceId, tenant, candidateId, requirement.id, input.evidenceKind, groundedOutcome, independence, source, JSON.stringify(payload), payloadHash, userId, verifier?.id ?? null, attestationVerified],
     );
     return { evidenceId, payloadHash, independence, source, binding };
-  });
 }
 
 export async function decideRelease(userId: string, candidateId: string, expectedPolicyHash: string, confirmation: string) {
@@ -328,13 +343,15 @@ export async function decideRelease(userId: string, candidateId: string, expecte
     const requirementResults = policy.requirements.map((requirement) => ({
       id: requirement.id,
       title: requirement.title,
-      status: evaluateRequirement(requirement, evidence.map((e) => ({ evidenceKind: e.evidence_kind, outcome: e.outcome, independence: e.independence }))).status,
+      status: evaluateRequirement(requirement, evidence.map((e) => ({ id: e.id, requirementId: e.requirement_id, evidenceKind: e.evidence_kind, outcome: e.outcome, independence: e.independence }))).status,
     }));
-    const gateReady = requirementResults.every((r) => r.status === "pass");
+    const experiments=await candidateExperimentReadiness(sql,tenant,candidateId);
+    const gateReady = requirementResults.every((r) => r.status === "pass") && experiments.every(e=>e.status==="survived");
     const verdict = gateReady ? "RELEASE" as const : "BLOCK" as const;
     const decidedAt = new Date().toISOString();
     const receiptPayload = {
       schema: "hodgeform-release-receipt/1",
+      evaluator: "hodgeform-obligation-evaluator/2",
       verdict,
       tenant,
       candidate: {
@@ -348,6 +365,7 @@ export async function decideRelease(userId: string, candidateId: string, expecte
       },
       policy: { id: plan.id, hash: plan.policy_hash, pack: policy.pack, packVersion: policy.packVersion, risk: policy.risk },
       requirements: requirementResults,
+      experiments,
       evidence: evidence.map((e) => ({ id: e.id, requirementId: e.requirement_id, kind: e.evidence_kind, outcome: e.outcome, independence: e.independence, source: e.source, verifierPrincipalId: e.verifier_principal_id ?? null, payloadHash: e.payload_hash })),
       approval: { approvedBy: userId, phraseHash: sha256(confirmation), decidedAt },
       boundary: "This receipt proves satisfaction of the exact configured gate, not universal agent safety.",

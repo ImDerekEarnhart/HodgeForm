@@ -45,6 +45,10 @@ jobs:
         run: node scripts/operator-provisioning-smoke.mjs
       - name: Real Postgres + HTTP tenant/API integration
         run: node scripts/postgres-http-integration.mjs
+      - name: Disposable signed verifier worker integration
+        run: node --experimental-strip-types scripts/verifier-container-smoke.mjs
+      - name: Evolution lifecycle service integration
+        run: node --experimental-strip-types --loader ./scripts/test-source-loader.mjs scripts/evolution-service-integration.mjs
       - name: Auth lifecycle HTTP integration
         run: node scripts/auth-http-integration.mjs
       - name: Readiness fails closed on Postgres connection loss

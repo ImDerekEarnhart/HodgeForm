@@ -11,9 +11,9 @@ test("semantic authority expansion compiles new obligations", () => {
 
 test("LLM pass cannot satisfy a blocking obligation, but LLM counterexample can fail it", () => {
   const r = { id:"X", title:"x", reason:"x", allowedEvidence:["llm_evaluation","deterministic_test"], minimumIndependence:"self", blocking:true, source:"pack" };
-  assert.equal(evaluateRequirement(r, [{ evidenceKind:"llm_evaluation", outcome:"pass", independence:"self" }]).status, "missing");
-  assert.equal(evaluateRequirement(r, [{ evidenceKind:"llm_evaluation", outcome:"fail", independence:"self" }]).status, "fail");
-  assert.equal(evaluateRequirement(r, [{ evidenceKind:"deterministic_test", outcome:"pass", independence:"self" }]).status, "pass");
+  assert.equal(evaluateRequirement(r, [{ requirementId:"X", evidenceKind:"llm_evaluation", outcome:"pass", independence:"self" }]).status, "missing");
+  assert.equal(evaluateRequirement(r, [{ requirementId:"X", evidenceKind:"llm_evaluation", outcome:"fail", independence:"self" }]).status, "fail");
+  assert.equal(evaluateRequirement(r, [{ requirementId:"X", evidenceKind:"deterministic_test", outcome:"pass", independence:"self" }]).status, "pass");
 });
 
 test("critical capability cannot opt out of four-eyes approval", () => {
