@@ -5,6 +5,7 @@ delete process.env.DATABASE_URL;
 process.env.HODGEFORM_DEPLOYMENT_MODE="private";
 process.env.HODGEFORM_PUBLIC_RELEASE="false";
 process.env.HODGEFORM_RELEASE_CHANNEL="development";
+process.env.HODGEFORM_AGENT_REQUESTS_PER_MINUTE="120";
 const {createRepository,createCandidate,getCandidate,createDiscovery,decideRelease}=await import("../src/lib/gate/service.server.ts");
 const {getSql}=await import("../src/lib/db.ts");
 const {registerVerifierPrincipal}=await import("../src/lib/gate/verifiers.server.ts");

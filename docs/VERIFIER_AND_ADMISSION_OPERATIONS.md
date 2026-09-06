@@ -56,3 +56,5 @@ This adapter authenticates repeated admissions of the same approved image within
 - Add revocation and rollout authorization before claiming portable receipts are sufficient for long-lived production admission.
 
 Do not upgrade `controlled_beta` to public GA merely because these components compile.
+
+Provider contract references: [Docker runtime constraints](https://docs.docker.com/engine/containers/run/) and [Kubernetes admission webhook configuration](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/).
