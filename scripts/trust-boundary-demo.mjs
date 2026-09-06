@@ -6,7 +6,7 @@ const policy = compilePolicy({
   capabilities: ["filesystem.read", "filesystem.write"],
 });
 const byId = new Map(policy.requirements.map((r) => [r.id, r]));
-const check = (id, evidence) => evaluateRequirement(byId.get(id), evidence).status;
+const check = (id, evidence) => evaluateRequirement(byId.get(id), evidence.map(e => ({ ...e, requirementId: id }))).status;
 const results = [
   { attack: "artifact changed after evaluation", verdict: check("HF-ART-001", [{ evidenceKind: "deterministic_test", outcome: "fail", independence: "self" }]) === "fail" ? "BLOCK" : "ERROR" },
   { attack: "mandatory independent evidence removed", verdict: check("HF-IND-001", []) === "missing" ? "BLOCK" : "ERROR" },
@@ -17,7 +17,7 @@ const allAttacksBlocked = results.every((r) => r.verdict === "BLOCK");
 const fixedEvidence = policy.requirements.map((r) => {
   const kind = r.allowedEvidence.find((k) => k !== "llm_evaluation" && k !== "human_approval") ?? r.allowedEvidence[0];
   const independence = r.minimumIndependence;
-  return { id: r.id, status: evaluateRequirement(r, [{ evidenceKind: kind, outcome: "pass", independence }]).status };
+  return { id: r.id, status: evaluateRequirement(r, [{ requirementId: r.id, evidenceKind: kind, outcome: "pass", independence }]).status };
 });
 const fixedGatePasses = fixedEvidence.every((r) => r.status === "pass");
 console.log("HodgeForm trust-boundary demo\n");

@@ -1,0 +1,88 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { trustedAuthOrigins } from "../src/lib/auth/trusted-origins.ts";
+import { enforceAgentRateLimit, RateLimitError } from "../src/lib/security/rate-limit.server.ts";
+
+test("production trusts only the configured authentication origin", () => {
+  assert.deepEqual(trustedAuthOrigins("https://app.example.com/auth", true), ["https://app.example.com"]);
+  assert.deepEqual(trustedAuthOrigins("https://app.example.com", false), [
+    "https://app.example.com", "http://localhost:8080", "http://127.0.0.1:8080",
+  ]);
+});
+
+test("limiter bounds unique accounts, preserves quotas, and reclaims expired entries", () => {
+  const originalNow = Date.now;
+  const originalLimit = process.env.HODGEFORM_AGENT_REQUESTS_PER_MINUTE;
+  let now = 1_000_000;
+  Date.now = () => now;
+  process.env.HODGEFORM_AGENT_REQUESTS_PER_MINUTE = "1";
+  try {
+    for (let i = 0; i < 10_000; i++) enforceAgentRateLimit(`account-${i}`);
+    assert.throws(() => enforceAgentRateLimit("overflow"), RateLimitError);
+    assert.throws(() => enforceAgentRateLimit("account-0"), RateLimitError);
+    now += 60_000;
+    assert.doesNotThrow(() => enforceAgentRateLimit("overflow"));
+    assert.doesNotThrow(() => enforceAgentRateLimit("account-0"));
+    assert.throws(() => enforceAgentRateLimit("account-0"), RateLimitError);
+  } finally {
+    Date.now = originalNow;
+    if (originalLimit === undefined) delete process.env.HODGEFORM_AGENT_REQUESTS_PER_MINUTE;
+    else process.env.HODGEFORM_AGENT_REQUESTS_PER_MINUTE = originalLimit;
+  }
+});
+
+import { sameSiteRequestAllowed } from "../src/lib/auth/request-provenance.ts";
+
+test("CSRF protection rejects foreign and null origins without Fetch Metadata", () => {
+  const origin = "https://hodgeform.com";
+  for (const claimedOrigin of ["https://evil.example", "https://sibling.hodgeform.com", "null"]) {
+    assert.equal(sameSiteRequestAllowed(new Request(origin, {
+      method: "POST", headers: { origin: claimedOrigin },
+    }), origin), false);
+  }
+  assert.equal(sameSiteRequestAllowed(new Request(origin, {
+    method: "POST", headers: { origin },
+  }), origin), true);
+  assert.equal(sameSiteRequestAllowed(new Request(origin, {
+    method: "POST", headers: { origin: "https://evil.example", "sec-fetch-site": "same-origin" },
+  }), origin), false);
+  assert.equal(sameSiteRequestAllowed(new Request(origin, {
+    headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" },
+  }), origin), true);
+  assert.equal(sameSiteRequestAllowed(new Request(origin, {
+    method: "POST", headers: { "sec-fetch-site": "same-site" },
+  }), origin), false);
+});
+
+import { boundedRequestBody, RequestBodyError } from "../src/lib/security/request-body.ts";
+
+test("request body guard preserves valid JSON and enforces actual streamed bytes", async () => {
+  const valid = new Request("https://hodgeform.com/api/test", { method: "POST", body: '{"ok":true}' });
+  assert.deepEqual(await (await boundedRequestBody(valid, 20)).json(), { ok: true });
+  for (const declared of [undefined, "1", "9999"]) {
+    const request = new Request("https://hodgeform.com/api/test", {
+      method: "POST", body: "x".repeat(100),
+      headers: declared === undefined ? {} : { "content-length": declared },
+    });
+    await assert.rejects(boundedRequestBody(request, 20), (error) => error instanceof RequestBodyError && error.status === 413);
+  }
+});
+
+test("request body guard times out and cancels a stalled upload", async () => {
+  let cancelled = false;
+  const request = new Request("https://hodgeform.com/api/test", {
+    method: "POST", duplex: "half",
+    body: new ReadableStream({ cancel() { cancelled = true; } }),
+  });
+  await assert.rejects(boundedRequestBody(request, 20, 20), (error) => error instanceof RequestBodyError && error.status === 408);
+  assert.equal(cancelled, true);
+});
+
+test("request body guard supports server-adapter requests without native branding", async () => {
+  const input = new Request("https://hodgeform.com/api/test", { method: "POST", body: '{"adapter":true}' });
+  const adapter = { url: input.url, method: input.method, headers: input.headers, body: input.body, signal: input.signal };
+  const result = await boundedRequestBody(adapter);
+  assert.deepEqual(await result.json(), { adapter: true });
+  assert.equal(result.method, "POST");
+  assert.equal(result.url, input.url);
+});

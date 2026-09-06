@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - run: npm ci
@@ -37,12 +37,18 @@ jobs:
       - run: node scripts/security-static-scan.mjs
       - run: npm run brand:check
       - run: npm run release:check
+      - name: Built preview database and runtime signup policy
+        run: node scripts/preview-http-smoke.mjs
       - run: python -m py_compile executor/server.py
       - run: npm run db:migrate
       - name: Invite-only operator provisioning smoke
         run: node scripts/operator-provisioning-smoke.mjs
       - name: Real Postgres + HTTP tenant/API integration
         run: node scripts/postgres-http-integration.mjs
+      - name: Disposable signed verifier worker integration
+        run: node --experimental-strip-types scripts/verifier-container-smoke.mjs
+      - name: Evolution lifecycle service integration
+        run: node --experimental-strip-types --loader ./scripts/test-source-loader.mjs scripts/evolution-service-integration.mjs
       - name: Auth lifecycle HTTP integration
         run: node scripts/auth-http-integration.mjs
       - name: Readiness fails closed on Postgres connection loss
@@ -70,6 +76,7 @@ jobs:
           HODGEFORM_SUPPORT_EMAIL: support@example.test
           HODGEFORM_SECURITY_EMAIL: security@example.test
           HODGEFORM_PRIVACY_EMAIL: privacy@example.test
+          HODGEFORM_ADMIN_EMAILS: admin@example.test
           HODGEFORM_LEGAL_REVIEWED: 'true'
         run: docker compose -f docker-compose.production.yml config >/dev/null
       - name: Build production image

@@ -18,8 +18,10 @@ RUN apk upgrade --no-cache \
 COPY --chown=hodgeform:hodgeform --from=build /app/.output ./.output
 COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --chown=hodgeform:hodgeform --from=build /app/scripts/migration-plan.mjs ./scripts/migration-plan.mjs
+COPY --chown=hodgeform:hodgeform --from=build /app/scripts/provision-operator.mjs ./scripts/provision-operator.mjs
+COPY --chown=hodgeform:hodgeform --from=build /app/scripts/bootstrap-operator.mjs ./scripts/bootstrap-operator.mjs
 COPY --chown=hodgeform:hodgeform --from=build /app/migrations ./migrations
 COPY --chown=hodgeform:hodgeform --from=build /app/node_modules ./node_modules
 USER hodgeform
 EXPOSE 3000
-CMD ["sh","-c","node scripts/migrate.mjs && node .output/server/index.mjs"]
+CMD ["sh","-c","node scripts/migrate.mjs && node scripts/bootstrap-operator.mjs && node .output/server/index.mjs"]

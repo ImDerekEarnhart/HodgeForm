@@ -5,6 +5,7 @@ import { pgliteDialect } from "./pglite-dialect";
 import { getPglite } from "../db";
 import { emailAndPasswordEnabled, minPasswordLength, signupsAllowed } from "./email-password";
 import { queueAuthEmail } from "./email.server";
+import { trustedAuthOrigins } from "./trusted-origins";
 
 const env = (key: string) => process.env[key]?.trim() || undefined;
 const authEnabled = env("VITE_AUTH_ENABLED") !== "false";
@@ -22,7 +23,7 @@ export const auth = betterAuth({
   baseURL,
   secret,
   database,
-  trustedOrigins: [baseURL, "http://localhost:8080", "http://127.0.0.1:8080"],
+  trustedOrigins: trustedAuthOrigins(baseURL, production),
   telemetry: { enabled: false },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => queueAuthEmail({ to: user.email, subject: "Verify your HodgeForm account", text: `Verify your email to activate HodgeForm: ${url}` }),

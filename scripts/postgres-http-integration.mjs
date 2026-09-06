@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { createHash, generateKeyPairSync, randomBytes } from "node:crypto";
+import { createHash, generateKeyPairSync, randomBytes, sign } from "node:crypto";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import pg from "pg";
+
+import { canonicalize, sha256 as objectHash } from "../src/lib/gate/crypto.server.ts";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL is required");
@@ -50,6 +52,8 @@ async function seed() {
 async function cleanup() {
   try {
     await q(`delete from api_tokens where user_id = any($1::text[])`, [[ids.a,ids.b,ids.c]]);
+    await q(`delete from verifier_jobs where tenant_id=$1`,[tenantA]);
+    await q(`delete from verifier_workers where tenant_id=$1`,[tenantA]);
     await q(`delete from verifier_principals where id=$1`, [verifierId]);
     await q(`delete from workspaces where id = any($1::text[])`, [[ids.wa,ids.wb]]);
     await q(`delete from "user" where id = any($1::text[])`, [[ids.a,ids.b,ids.c]]);
@@ -94,6 +98,7 @@ try {
     HODGEFORM_SUPPORT_EMAIL: "support@example.test",
     HODGEFORM_SECURITY_EMAIL: "security@example.test",
     HODGEFORM_PRIVACY_EMAIL: "privacy@example.test",
+    HODGEFORM_ADMIN_EMAILS: "admin@example.test",
     HODGEFORM_DATA_RETENTION_DAYS: "30",
     HODGEFORM_LEGAL_REVIEWED: "true",
   };
@@ -113,6 +118,12 @@ try {
 
   const candidateA = await request(tokenA, "/api/v1/candidates", { method: "POST", body: JSON.stringify({ repositoryId: repoA.body.id, version: "v1", artifactHash: "a".repeat(64), manifest: { name: "Agent A", capabilities: [] }, intent: { pack: "basic", dataClass: "internal" } }) });
   assert.equal(candidateA.status, 201);
+  const frozenA = await request(tokenA, `/api/v1/candidates/${candidateA.body.candidateId}`);
+  const detailsA = frozenA.body;
+  assert.equal(detailsA.gateReady, false, "artifact freeze alone cannot satisfy other obligations");
+  assert.equal(detailsA.verdicts.find(v => v.requirement.id === "HF-REG-001").status, "missing");
+  assert.equal(detailsA.verdicts.find(v => v.requirement.id === "HF-CAP-001").status, "missing");
+
 
   const highRisk = await request(tokenA, "/api/v1/candidates", { method: "POST", body: JSON.stringify({ repositoryId: repoA.body.id, version: "high-risk-v1", artifactHash: "d".repeat(64), manifest: { name: "Payment Agent", capabilities: ["payment.execute"] }, intent: { pack: "high-risk", dataClass: "confidential" } }) });
   assert.equal(highRisk.status,201);
@@ -124,6 +135,22 @@ try {
   assert.equal(boundIndependent.body.source,"verifier:Independent integration verifier");
   assert.equal(boundIndependent.body.binding.artifactHash,"d".repeat(64));
   assert.equal(boundIndependent.body.binding.verifierPrincipalId,verifierId);
+  const workerId=`worker_it_${suffix}`,jobId=`job_it_${suffix}`;
+  const wk=generateKeyPairSync("ed25519"),workerPem=wk.publicKey.export({type:"spki",format:"pem"});
+  const image=`sha256:${"c".repeat(64)}`;
+  await q(`insert into verifier_workers(id,tenant_id,verifier_principal_id,image,evidence_kind,public_key_pem,allowed_requirements_json,created_by) values($1,$2,$3,$4,'deterministic_test',$5,'["HF-REG-001"]',$6)`,[workerId,tenantA,verifierId,image,workerPem,ids.a]);
+  const now=Date.now();
+  const job={schema:"hodgeform-verifier-job/1",id:jobId,tenantId:tenantA,candidateId:candidateA.body.candidateId,artifactHash:"a".repeat(64),policyHash:candidateA.body.policyHash,requirementId:"HF-REG-001",experimentHash:null,workerId,image,evidenceKind:"deterministic_test",createdAt:new Date(now).toISOString(),expiresAt:new Date(now+60_000).toISOString(),nonce:suffix,limits:{seconds:120,memoryMb:256,pids:64}};
+  await q(`insert into verifier_jobs(id,tenant_id,worker_id,candidate_id,job_json,job_hash,expires_at,created_by) values($1,$2,$3,$4,$5::jsonb,$6,$7,$8)`,[jobId,tenantA,workerId,job.candidateId,JSON.stringify(job),objectHash(job),job.expiresAt,ids.a]);
+  const payload={schema:"hodgeform-worker-result/1",jobId,jobHash:objectHash(job),outcome:"pass",measurements:{failed_tests:0},details:"Signed integration fixture, not a real container execution",outputHash:"e".repeat(64),startedAt:job.createdAt,finishedAt:new Date().toISOString()};
+  const attestation={payload,signature:sign(null,Buffer.from(canonicalize(payload)),wk.privateKey).toString("base64")};
+  assert.equal((await request(tokenB,"/api/v1/verifier-jobs",{method:"POST",body:JSON.stringify(attestation)})).status,400);
+  assert.equal((await request(tokenVerifier,"/api/v1/verifier-jobs",{method:"POST",body:JSON.stringify({...attestation,payload:{...payload,outcome:"fail"}})})).status,400);
+  const concurrentResults=await Promise.all([1,2].map(()=>request(tokenVerifier,"/api/v1/verifier-jobs",{method:"POST",body:JSON.stringify(attestation)})));
+  assert.deepEqual(concurrentResults.map(r=>r.status).sort(),[201,400],"signed job may be consumed exactly once under concurrent replay");
+  const authenticatedEvidence=await q(`select attestation_verified from evidence_receipts where tenant_id=$1 and candidate_id=$2 and requirement_id='HF-REG-001'`,[tenantA,job.candidateId]);
+  assert.equal(authenticatedEvidence.rows.length,1);assert.equal(authenticatedEvidence.rows[0].attestation_verified,true);
+
   const crossRead = await request(tokenB, `/api/v1/candidates/${candidateA.body.candidateId}`);
   assert.equal(crossRead.status, 404, "cross-tenant candidate read must be hidden");
   const crossCreate = await request(tokenB, "/api/v1/candidates", { method: "POST", body: JSON.stringify({ repositoryId: repoA.body.id, version: "evil", artifactHash: "b".repeat(64), manifest: { name: "Cross Tenant", capabilities: [] }, intent: { pack: "basic", dataClass: "internal" } }) });

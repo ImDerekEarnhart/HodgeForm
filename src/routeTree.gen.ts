@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DiscoveriesRouteImport } from './routes/discoveries'
 import { Route as GatesRouteImport } from './routes/gates'
 import { Route as LoginRouteImport } from './routes/login'
@@ -24,6 +25,7 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiV1CandidatesRouteImport } from './routes/api/v1/candidates'
 import { Route as ApiV1RepositoriesRouteImport } from './routes/api/v1/repositories'
+import { Route as ApiV1VerifierJobsRouteImport } from './routes/api/v1/verifier-jobs'
 import { Route as ApiV1CandidatesIdRouteImport } from './routes/api/v1/candidates/$id'
 import { Route as ApiV1CandidatesIdEvidenceRouteImport } from './routes/api/v1/candidates/$id/evidence'
 import { Route as ApiV1CandidatesIdReceiptRouteImport } from './routes/api/v1/candidates/$id/receipt'
@@ -36,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
 const AcceptInviteRoute = AcceptInviteRouteImport.update({
   id: '/accept-invite',
   path: '/accept-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoveriesRoute = DiscoveriesRouteImport.update({
@@ -103,6 +110,11 @@ const ApiV1RepositoriesRoute = ApiV1RepositoriesRouteImport.update({
   path: '/api/v1/repositories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1VerifierJobsRoute = ApiV1VerifierJobsRouteImport.update({
+  id: '/api/v1/verifier-jobs',
+  path: '/api/v1/verifier-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1CandidatesIdRoute = ApiV1CandidatesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -124,6 +136,7 @@ const ApiV1CandidatesIdReceiptRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/admin': typeof AdminRoute
   '/discoveries': typeof DiscoveriesRoute
   '/gates': typeof GatesRoute
   '/login': typeof LoginRoute
@@ -137,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/candidates': typeof ApiV1CandidatesRouteWithChildren
   '/api/v1/repositories': typeof ApiV1RepositoriesRoute
+  '/api/v1/verifier-jobs': typeof ApiV1VerifierJobsRoute
   '/api/v1/candidates/$id': typeof ApiV1CandidatesIdRouteWithChildren
   '/api/v1/candidates/$id/evidence': typeof ApiV1CandidatesIdEvidenceRoute
   '/api/v1/candidates/$id/receipt': typeof ApiV1CandidatesIdReceiptRoute
@@ -144,6 +158,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/admin': typeof AdminRoute
   '/discoveries': typeof DiscoveriesRoute
   '/gates': typeof GatesRoute
   '/login': typeof LoginRoute
@@ -157,6 +172,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/candidates': typeof ApiV1CandidatesRouteWithChildren
   '/api/v1/repositories': typeof ApiV1RepositoriesRoute
+  '/api/v1/verifier-jobs': typeof ApiV1VerifierJobsRoute
   '/api/v1/candidates/$id': typeof ApiV1CandidatesIdRouteWithChildren
   '/api/v1/candidates/$id/evidence': typeof ApiV1CandidatesIdEvidenceRoute
   '/api/v1/candidates/$id/receipt': typeof ApiV1CandidatesIdReceiptRoute
@@ -165,6 +181,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/admin': typeof AdminRoute
   '/discoveries': typeof DiscoveriesRoute
   '/gates': typeof GatesRoute
   '/login': typeof LoginRoute
@@ -178,6 +195,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/candidates': typeof ApiV1CandidatesRouteWithChildren
   '/api/v1/repositories': typeof ApiV1RepositoriesRoute
+  '/api/v1/verifier-jobs': typeof ApiV1VerifierJobsRoute
   '/api/v1/candidates/$id': typeof ApiV1CandidatesIdRouteWithChildren
   '/api/v1/candidates/$id/evidence': typeof ApiV1CandidatesIdEvidenceRoute
   '/api/v1/candidates/$id/receipt': typeof ApiV1CandidatesIdReceiptRoute
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accept-invite'
+    | '/admin'
     | '/discoveries'
     | '/gates'
     | '/login'
@@ -200,6 +219,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/v1/candidates'
     | '/api/v1/repositories'
+    | '/api/v1/verifier-jobs'
     | '/api/v1/candidates/$id'
     | '/api/v1/candidates/$id/evidence'
     | '/api/v1/candidates/$id/receipt'
@@ -207,6 +227,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accept-invite'
+    | '/admin'
     | '/discoveries'
     | '/gates'
     | '/login'
@@ -220,6 +241,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/v1/candidates'
     | '/api/v1/repositories'
+    | '/api/v1/verifier-jobs'
     | '/api/v1/candidates/$id'
     | '/api/v1/candidates/$id/evidence'
     | '/api/v1/candidates/$id/receipt'
@@ -227,6 +249,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/accept-invite'
+    | '/admin'
     | '/discoveries'
     | '/gates'
     | '/login'
@@ -240,6 +263,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/v1/candidates'
     | '/api/v1/repositories'
+    | '/api/v1/verifier-jobs'
     | '/api/v1/candidates/$id'
     | '/api/v1/candidates/$id/evidence'
     | '/api/v1/candidates/$id/receipt'
@@ -248,6 +272,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcceptInviteRoute: typeof AcceptInviteRoute
+  AdminRoute: typeof AdminRoute
   DiscoveriesRoute: typeof DiscoveriesRoute
   GatesRoute: typeof GatesRoute
   LoginRoute: typeof LoginRoute
@@ -261,6 +286,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiV1CandidatesRoute: typeof ApiV1CandidatesRouteWithChildren
   ApiV1RepositoriesRoute: typeof ApiV1RepositoriesRoute
+  ApiV1VerifierJobsRoute: typeof ApiV1VerifierJobsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -277,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/accept-invite'
       fullPath: '/accept-invite'
       preLoaderRoute: typeof AcceptInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discoveries': {
@@ -370,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1RepositoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/verifier-jobs': {
+      id: '/api/v1/verifier-jobs'
+      path: '/api/v1/verifier-jobs'
+      fullPath: '/api/v1/verifier-jobs'
+      preLoaderRoute: typeof ApiV1VerifierJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/candidates/$id': {
       id: '/api/v1/candidates/$id'
       path: '/$id'
@@ -422,6 +462,7 @@ const ApiV1CandidatesRouteWithChildren = ApiV1CandidatesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcceptInviteRoute: AcceptInviteRoute,
+  AdminRoute: AdminRoute,
   DiscoveriesRoute: DiscoveriesRoute,
   GatesRoute: GatesRoute,
   LoginRoute: LoginRoute,
@@ -435,6 +476,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiV1CandidatesRoute: ApiV1CandidatesRouteWithChildren,
   ApiV1RepositoriesRoute: ApiV1RepositoriesRoute,
+  ApiV1VerifierJobsRoute: ApiV1VerifierJobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

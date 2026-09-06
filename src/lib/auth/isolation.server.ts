@@ -1,4 +1,5 @@
 import { getRequest } from "@tanstack/react-start/server";
+import { sameSiteRequestAllowed } from "./request-provenance";
 
 /**
  * Fetch-Metadata sibling isolation — **server-only** (`.server.ts` suffix).
@@ -14,9 +15,10 @@ import { getRequest } from "@tanstack/react-start/server";
  * app's authenticated server functions with scripted fetch/XHR/form requests.
  *
  * We allow only: same-origin requests (this app's own client), non-browser
- * requests (SSR / server-to-server, which send no `Sec-Fetch-Site`), and
+ * requests without browser provenance headers (SSR / server-to-server), and
  * top-level GET navigations (how the OAuth callback and normal page loads
  * arrive). Every cross-site / same-site *scripted* request is rejected.
+ * An explicit foreign or null Origin is always rejected, even without Fetch Metadata.
  * Together with `__Host-` cookies and Better Auth's `trustedOrigins`, this
  * closes the sibling-tenant attack surface. Enforced at the `authMiddleware`
  * chokepoint (see `middleware.ts`).
@@ -33,19 +35,6 @@ export class CrossSiteRequestError extends Error {
 export function assertSameSiteRequest(): void {
   const request = getRequest();
   if (!request) return; // no request context (e.g. build) — nothing to guard
-  const h = request.headers;
-  const site = h.get("sec-fetch-site");
-  // Non-browser client (no header), the app's own origin, or a direct
-  // (address-bar/bookmark) load are all fine.
-  if (!site || site === "same-origin" || site === "none") return;
-  // A top-level GET navigation is fine even when it is cross-site; scripted
-  // requests never set navigate mode.
-  const dest = h.get("sec-fetch-dest");
-  const isTopLevelGet =
-    h.get("sec-fetch-mode") === "navigate" &&
-    request.method === "GET" &&
-    dest !== "object" &&
-    dest !== "embed";
-  if (isTopLevelGet) return;
-  throw new CrossSiteRequestError();
+  const expectedOrigin = new URL(process.env.BETTER_AUTH_URL?.trim() || request.url).origin;
+  if (!sameSiteRequestAllowed(request, expectedOrigin)) throw new CrossSiteRequestError();
 }

@@ -39,6 +39,8 @@ export function publicReleaseConfig() {
     if (!process.env.HODGEFORM_SUPPORT_EMAIL?.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) issues.push("HODGEFORM_SUPPORT_EMAIL is missing or invalid");
     if (!process.env.HODGEFORM_SECURITY_EMAIL?.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) issues.push("HODGEFORM_SECURITY_EMAIL is missing or invalid");
     if (!process.env.HODGEFORM_PRIVACY_EMAIL?.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) issues.push("HODGEFORM_PRIVACY_EMAIL is missing or invalid");
+    const adminEmails = (process.env.HODGEFORM_ADMIN_EMAILS ?? "").split(",").map((email) => email.trim()).filter(Boolean);
+    if (!adminEmails.length || adminEmails.some((email) => !email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/))) issues.push("HODGEFORM_ADMIN_EMAILS must contain at least one valid administrator email");
     const retentionDays = Number(process.env.HODGEFORM_DATA_RETENTION_DAYS);
     if (!Number.isInteger(retentionDays) || retentionDays < 1) issues.push("HODGEFORM_DATA_RETENTION_DAYS must be a positive integer");
     const signups = /^(true|1)$/i.test(process.env.HODGEFORM_ALLOW_SIGNUPS ?? "");

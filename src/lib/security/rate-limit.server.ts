@@ -9,6 +9,8 @@
 
 type Bucket = { count: number; resetAt: number };
 const buckets = new Map<string, Bucket>();
+const MAX_BUCKETS = 10_000;
+let nextSweepAt = 0;
 
 function intEnv(key: string, fallback: number, min: number, max: number): number {
   const raw = Number(process.env[key] ?? fallback);
@@ -30,10 +32,22 @@ export class RateLimitError extends Error {
 export function enforceAgentRateLimit(userId: string): void {
   const limit = intEnv("HODGEFORM_AGENT_REQUESTS_PER_MINUTE", 12, 1, 600);
   const now = Date.now();
+  // Sweep before the new-user early return so expired entries are reclaimed
+  // even when every request comes from a different account.
+  if (now >= nextSweepAt) {
+    for (const [id, value] of buckets) {
+      if (value.resetAt <= now) buckets.delete(id);
+    }
+    nextSweepAt = now + 60_000;
+  }
   const key = `agent:${userId}`;
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {
+    // Never evict an active bucket: doing so resets that account's quota.
+    if (!bucket && buckets.size >= MAX_BUCKETS) {
+      throw new RateLimitError(Math.max(1, Math.ceil((nextSweepAt - now) / 1000)));
+    }
     buckets.set(key, { count: 1, resetAt: now + 60_000 });
     return;
   }
@@ -42,9 +56,4 @@ export function enforceAgentRateLimit(userId: string): void {
   }
   bucket.count += 1;
 
-  if (buckets.size > 10_000) {
-    for (const [id, value] of buckets) {
-      if (value.resetAt <= now) buckets.delete(id);
-    }
-  }
 }

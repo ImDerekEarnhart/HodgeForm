@@ -28,10 +28,10 @@ const requirement = {
   source: "baseline",
 };
 const evidenceChecks = [
-  { id: "llm-pass-is-not-authority", expected: "missing", actual: evaluateRequirement(requirement, [{ evidenceKind: "llm_evaluation", outcome: "pass", independence: "independent" }]).status },
-  { id: "llm-counterexample-blocks", expected: "fail", actual: evaluateRequirement(requirement, [{ evidenceKind: "llm_evaluation", outcome: "fail", independence: "independent" }]).status },
-  { id: "same-team-cannot-satisfy-independent", expected: "missing", actual: evaluateRequirement(requirement, [{ evidenceKind: "deterministic_test", outcome: "pass", independence: "same_team" }]).status },
-  { id: "independent-deterministic-pass", expected: "pass", actual: evaluateRequirement(requirement, [{ evidenceKind: "deterministic_test", outcome: "pass", independence: "independent" }]).status },
+  { id: "llm-pass-is-not-authority", expected: "missing", actual: evaluateRequirement(requirement, [{ requirementId: requirement.id, evidenceKind: "llm_evaluation", outcome: "pass", independence: "independent" }]).status },
+  { id: "llm-counterexample-blocks", expected: "fail", actual: evaluateRequirement(requirement, [{ requirementId: requirement.id, evidenceKind: "llm_evaluation", outcome: "fail", independence: "independent" }]).status },
+  { id: "same-team-cannot-satisfy-independent", expected: "missing", actual: evaluateRequirement(requirement, [{ requirementId: requirement.id, evidenceKind: "deterministic_test", outcome: "pass", independence: "same_team" }]).status },
+  { id: "independent-deterministic-pass", expected: "pass", actual: evaluateRequirement(requirement, [{ requirementId: requirement.id, evidenceKind: "deterministic_test", outcome: "pass", independence: "independent" }]).status },
 ];
 const evidenceExact = evidenceChecks.filter((c) => c.actual === c.expected).length;
 const result = {

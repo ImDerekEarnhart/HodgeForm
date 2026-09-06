@@ -3,9 +3,12 @@ import { publicReleaseConfig } from "@/lib/gate/config.server";
 import { readinessStatus } from "@/lib/ops/readiness.server";
 import { logEvent, requestId } from "@/lib/ops/log.server";
 import { publicPage } from "@/lib/ops/public-pages.server";
+import { boundedRequestBody, RequestBodyError } from "@/lib/security/request-body";
 
 function harden(response: Response, id?: string): Response {
   const headers = new Headers(response.headers);
+  // Dynamic SSR and API responses can contain session-specific tenant data.
+  headers.set("Cache-Control", "private, no-store");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -24,6 +27,9 @@ export default createServerEntry({
     const started = Date.now();
     const url = new URL(request.url);
     try {
+      void import("@/lib/ops/analytics.server").then(({ recordPublicPageView }) => recordPublicPageView(request)).catch((error) => {
+        logEvent("warn", "analytics_record_failed", { request_id: id, error: error instanceof Error ? error.message : String(error) });
+      });
       const legalPage = publicPage(url.pathname);
       if (legalPage) {
         const response = harden(new Response(legalPage, { status: 200, headers: { "content-type": "text/html; charset=utf-8" } }), id);
@@ -48,10 +54,15 @@ export default createServerEntry({
         logEvent("error", "unsafe_production_config", { request_id: id, method: request.method, path: url.pathname, issues: config.issues, status: 503, duration_ms: Date.now() - started });
         return response;
       }
-      const response = harden(await handler.fetch(request), id);
+      const boundedRequest = await boundedRequestBody(request);
+      const response = harden(await handler.fetch(boundedRequest), id);
       logEvent(response.status >= 500 ? "error" : response.status >= 400 ? "warn" : "info", "http_request", { request_id: id, method: request.method, path: url.pathname, status: response.status, duration_ms: Date.now() - started });
       return response;
     } catch (error) {
+      if (error instanceof RequestBodyError) {
+        logEvent("warn", "http_body_rejected", { request_id: id, status: error.status });
+        return harden(Response.json({ error: error.message, requestId: id }, { status: error.status }), id);
+      }
       logEvent("error", "http_unhandled_error", { request_id: id, method: request.method, path: url.pathname, duration_ms: Date.now() - started, error: error instanceof Error ? error.message : String(error) });
       return harden(Response.json({ error: "Internal server error", requestId: id }, { status: 500 }), id);
     }
