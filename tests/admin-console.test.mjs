@@ -2,6 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { adminEmailAllowed, adminEmails, publicTrafficGroup } from "../src/lib/admin/policy.ts";
+import { PGlite } from "@electric-sql/pglite";
+import {
+  ADMIN_DAILY_SIGNUPS_QUERY,
+  ADMIN_DAILY_TRAFFIC_QUERY,
+  ADMIN_DAILY_VISITORS_QUERY,
+} from "../src/lib/admin/queries.ts";
 
 test("platform administrator allowlist uses exact normalized email matches", () => {
   assert.deepEqual([...adminEmails(" OWNER@Example.com, second@example.com ")], ["owner@example.com", "second@example.com"]);
@@ -15,6 +21,25 @@ test("visitor analytics only classify public product pages", () => {
   assert.equal(publicTrafficGroup("/login"), "auth");
   assert.equal(publicTrafficGroup("/privacy"), "legal");
   for (const path of ["/admin", "/overview", "/api/ready", "/assets/app.js"]) assert.equal(publicTrafficGroup(path), null);
+});
+
+test("admin daily aggregation queries execute on PostgreSQL", async () => {
+  const database = new PGlite();
+  try {
+    await database.exec(`
+      create table platform_daily_traffic(day date not null, route_group text not null, page_views bigint not null default 0);
+      create table platform_daily_visitors(day date not null, visitor_hash text not null);
+      create table "user"("createdAt" timestamptz not null);
+      insert into "user"("createdAt") values(now());
+    `);
+    await database.query(ADMIN_DAILY_TRAFFIC_QUERY);
+    await database.query(ADMIN_DAILY_VISITORS_QUERY);
+    const signups = await database.query(ADMIN_DAILY_SIGNUPS_QUERY);
+    assert.equal(Number(signups.rows[0].signups), 1);
+    assert.ok(signups.rows[0].signup_day);
+  } finally {
+    await database.close();
+  }
 });
 
 test("admin data and actions are protected by server middleware", async () => {

@@ -3,6 +3,11 @@ import { getSql } from "@/lib/db";
 import { publicEmailConfigured } from "@/lib/auth/email.server";
 import { releaseKeyConfigured } from "@/lib/gate/crypto.server";
 import { publicReleaseConfig } from "@/lib/gate/config.server";
+import {
+  ADMIN_DAILY_SIGNUPS_QUERY,
+  ADMIN_DAILY_TRAFFIC_QUERY,
+  ADMIN_DAILY_VISITORS_QUERY,
+} from "@/lib/admin/queries";
 
 const numberValue = (value: unknown) => Number(value ?? 0);
 
@@ -28,9 +33,9 @@ export async function getAdminDashboard(_userId: string) {
       (select count(*) from evidence_receipts) evidence,
       (select count(*) from discovery_commits) discoveries,
       (select count(*) from api_tokens where revoked_at is null) active_tokens`),
-    sql.query<{ day: string; page_views: unknown }>(`select day,sum(page_views)::bigint page_views from platform_daily_traffic where day>=current_date-13 group by day order by day`),
-    sql.query<{ day: string; unique_visitors: unknown }>(`select day,count(*)::bigint unique_visitors from platform_daily_visitors where day>=current_date-13 group by day order by day`),
-    sql.query<{ day: string; signups: unknown }>(`select "createdAt"::date day,count(*)::bigint signups from "user" where "createdAt">=current_date-13 group by "createdAt"::date order by day`),
+    sql.query<{ day: string; page_views: unknown }>(ADMIN_DAILY_TRAFFIC_QUERY),
+    sql.query<{ day: string; unique_visitors: unknown }>(ADMIN_DAILY_VISITORS_QUERY),
+    sql.query<{ signup_day: string; signups: unknown }>(ADMIN_DAILY_SIGNUPS_QUERY),
     sql.query<{ id: string; name: string; email: string; verified: boolean; created_at: string; last_seen: string | null; workspace_count: unknown }>(`select u.id,u.name,u.email,u."emailVerified" verified,u."createdAt" created_at,max(s."updatedAt") last_seen,count(distinct m.workspace_id)::bigint workspace_count from "user" u left join "session" s on s."userId"=u.id left join workspace_members m on m.user_id=u.id group by u.id order by u."createdAt" desc limit 20`),
     sql.query<{ id: string; name: string; slug: string; created_at: string; members: unknown; candidates: unknown }>(`select w.id,w.name,w.slug,w.created_at,count(distinct m.user_id)::bigint members,count(distinct c.id)::bigint candidates from workspaces w left join workspace_members m on m.workspace_id=w.id left join release_candidates c on c.tenant_id='workspace:'||w.id group by w.id order by w.created_at desc limit 20`),
     sql.query<{ id: string; email: string; role: string; workspace: string; expires_at: string; created_at: string }>(`select i.id,i.email,i.role,w.name workspace,i.expires_at,i.created_at from workspace_invites i join workspaces w on w.id=i.workspace_id where i.accepted_at is null and i.expires_at>now() order by i.created_at desc limit 20`),
@@ -44,7 +49,7 @@ export async function getAdminDashboard(_userId: string) {
   }
   for (const row of traffic) if (byDay.has(row.day)) byDay.get(row.day)!.pageViews = numberValue(row.page_views);
   for (const row of visitors) if (byDay.has(row.day)) byDay.get(row.day)!.uniqueVisitors = numberValue(row.unique_visitors);
-  for (const row of signups) if (byDay.has(row.day)) byDay.get(row.day)!.signups = numberValue(row.signups);
+  for (const row of signups) if (byDay.has(row.signup_day)) byDay.get(row.signup_day)!.signups = numberValue(row.signups);
   return {
     counts: Object.fromEntries(Object.entries(first).map(([key, value]) => [key, numberValue(value)])),
     daily: [...byDay.values()],

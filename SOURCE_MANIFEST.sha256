@@ -78,7 +78,8 @@ cdecf1fa8a1df9ee2cccc7fc1656ee1fa9e6fe2741d8d7bcaed4c1bcf35c8795  ./src/componen
 faae9b0e0939c54fdd169314394773e8feee82ba7e18a63e3fb88be9dbd91db9  ./src/lib/admin/api.ts
 165f78feb3bde9d47177faf9d81787e04bda09ee7d4ce3c9b5153bdf62a62a83  ./src/lib/admin/middleware.ts
 9aefef24ca7601188c99c5de363f2a256adbf7d7d271024240cbfba20aaab0d0  ./src/lib/admin/policy.ts
-a75906e184b17a0849091443ef64803911c290d9a3b5e5563c728eaf603fea63  ./src/lib/admin/service.server.ts
+f8e72cd0125419947894998ed73268e3fc68d4ef6caecdbfeff339fe7036abca  ./src/lib/admin/queries.ts
+c79345240e4f128b403f1237fdd133862418dc2624be33cdcc182bb6a5e89e30  ./src/lib/admin/service.server.ts
 7a6c3891e4d53c86887ccf4d1d07d7725cad8fb6dbaa47155f819d2e133fb753  ./src/lib/auth/client.ts
 66a7c07c0acf216e91ca92c323e54f029a01e52b6ebb43c8d77513e539b9f6d2  ./src/lib/auth/email-password.ts
 7b2e86da4f26f54e3930388724693df3596288c6ccd1b8e254591a4e98448a92  ./src/lib/auth/email.server.ts
@@ -141,7 +142,7 @@ b8ac0d3a29486200369fd15b8bd70bf945be90bc3b0685013bb8ab6390a39aaf  ./src/routes/r
 f14aa05687e2ae0f710114e789bcdbb4af45428f7cd1845f760690852e9a282d  ./src/routes/workspace.tsx
 58c82b95875b9338417bb91069bf52ad80ca82cb4bebb3bf546102710efc49fc  ./src/server.ts
 476ea4c50cdee549f03232e63e0be624ba53cac23ce04d5204dd0cd0a8af5e5f  ./src/styles.css
-c2d03e6d9aa32b6c7c4a344c17acf16d2646120eebb1deefc4f2cc14047f5ded  ./tests/admin-console.test.mjs
+8c5ef508ab0178f0d4b367bfc3cb83fe7fef063cb7ad4c1aefdd151e90a84c08  ./tests/admin-console.test.mjs
 43783c9dd8f2112227d4f8158daaa7745c167b8cb8268c54f06753192f66607b  ./tests/auth-contract.test.mjs
 32c43b2d54d126068cc0789f6d6e23708a27f39e280dd1d6315cc1ca65d52697  ./tests/container-contract.test.mjs
 a6785a70e1e81d91762572647ad497e538f8a83187b69a3a47d6b7a96f55c5f8  ./tests/database-resilience.test.mjs
