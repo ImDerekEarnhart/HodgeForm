@@ -38,23 +38,23 @@ try {
       if (!idempotent) throw new Error("An account with this email already exists; use the normal password-reset or owner-recovery procedure");
       await client.query("COMMIT");
       console.log(JSON.stringify({ status: "operator_already_provisioned", email }));
-      return;
-    }
-    await client.query(
+    } else {
+      await client.query(
       `insert into "user"("id","name","email","emailVerified","createdAt","updatedAt") values($1,$2,$3,true,now(),now())`,
       [userId, name.slice(0, 120), email],
-    );
-    await client.query(
+      );
+      await client.query(
       `insert into "account"("id","accountId","providerId","userId","password","createdAt","updatedAt") values($1,$2,'credential',$3,$4,now(),now())`,
       [accountId, userId, userId, passwordHash],
-    );
-    if ((process.env.HODGEFORM_DEPLOYMENT_MODE ?? "saas").trim().toLowerCase() === "saas") {
+      );
+      if ((process.env.HODGEFORM_DEPLOYMENT_MODE ?? "saas").trim().toLowerCase() === "saas") {
       await client.query(`insert into workspaces(id,slug,name,created_by) values($1,$2,$3,$4)`, [workspaceId, workspaceSlug, `${name.slice(0, 90)} workspace`, userId]);
       await client.query(`insert into workspace_members(workspace_id,user_id,role) values($1,$2,'owner')`, [workspaceId, userId]);
       await client.query(`insert into user_workspace_preferences(user_id,workspace_id) values($1,$2)`, [userId, workspaceId]);
+      }
+      await client.query("COMMIT");
+      console.log(JSON.stringify({ status: "operator_provisioned", email, userId, workspaceId: (process.env.HODGEFORM_DEPLOYMENT_MODE ?? "saas").toLowerCase() === "saas" ? workspaceId : null }));
     }
-    await client.query("COMMIT");
-    console.log(JSON.stringify({ status: "operator_provisioned", email, userId, workspaceId: (process.env.HODGEFORM_DEPLOYMENT_MODE ?? "saas").toLowerCase() === "saas" ? workspaceId : null }));
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;

@@ -63,7 +63,7 @@ aef4a44cf529998f3812e5149454b08ca19c5bc1e94f72d9abf030b822a01f0c  ./scripts/post
 63e06891630c4e02a1dbab8d812af6859a7920b1c1fbf1e606bd55ec7ea4465e  ./scripts/postgres-http-integration.mjs
 ffce0bdf88c6ce566f3db8fdda9f45ef7d1001c03735cf797198428fccd35694  ./scripts/postgres-restore.sh
 e7592d83af5ae9681dc954248ae63c1d0788cdfeb29499f652cd175ee58b6c69  ./scripts/preview-http-smoke.mjs
-f1a8fd896ff5a39544293f20625e1e1dca2a2a20478c5daf097562ea0e013623  ./scripts/provision-operator.mjs
+7e60d724440a79d2ca893bfe1b8b257eaccea2ce1f318075b32872937aef1f22  ./scripts/provision-operator.mjs
 298b9f7b555af470e8e06c82b3261312b4b5e316c8652aec808c0c93f6f5d2a2  ./scripts/security-static-scan.mjs
 2ec14f44cbba1b080ac2729c0f9a3f1163bf03316492d14c0586542a176178aa  ./scripts/trust-boundary-demo.mjs
 99734aafdfc40ef877732a3be27981e157bf71ca27c774afd058731e991c0759  ./scripts/trustbench.mjs
