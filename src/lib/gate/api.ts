@@ -1,19 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { authMiddleware } from "@/lib/auth/middleware";
-import { CAPABILITIES } from "./types";
+import { candidateSchema } from "./candidate-schema";
+import { experimentProtocolSchema } from "./experiment";
 
 const repoSchema = z.object({ name: z.string().min(1).max(100), description: z.string().max(500).optional() });
-const intentSchema = z.object({
-  pack: z.enum(["basic", "networked", "code-execution", "action-taking", "high-risk"]),
-  dataClass: z.enum(["public", "internal", "confidential", "regulated"]),
-  separateApprover: z.boolean().optional(),
-});
-const manifestSchema = z.object({
-  name: z.string().min(1).max(120), framework: z.string().max(80).optional(), description: z.string().max(1000).optional(), artifactUri: z.string().max(500).optional(),
-  capabilities: z.array(z.enum(CAPABILITIES)).max(30), metadata: z.record(z.string(), z.string()).optional(),
-});
-
 export const getOverview = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(async ({ context }) => (await import("./service.server")).getOverview(context.userId));
 export const listRepositories = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(async ({ context }) => (await import("./service.server")).listRepositories(context.userId));
 export const listCandidates = createServerFn({ method: "GET" }).middleware([authMiddleware]).validator((input: { repositoryId?: string } = {}) => ({ repositoryId: input?.repositoryId?.slice(0, 100) })).handler(async ({ data, context }) => (await import("./service.server")).listCandidates(context.userId, data.repositoryId));
@@ -24,7 +15,7 @@ export const createRepository = createServerFn({ method: "POST" }).middleware([a
 
 export const createCandidate = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator((input: unknown) => z.object({ repositoryId: z.string().min(1).max(100), version: z.string().min(1).max(80), artifactHash: z.string().regex(/^[a-fA-F0-9]{64}$/), manifest: manifestSchema, intent: intentSchema }).parse(input))
+  .validator((input: unknown) => candidateSchema.parse(input))
   .handler(async ({ data, context }) => (await import("./service.server")).createCandidate(context.userId, data));
 
 export const proposeAdversarialChecks = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator((input: unknown) => z.object({ candidateId: z.string().min(1).max(100) }).parse(input)).handler(async ({ data, context }) => (await import("./service.server")).proposeAdversarialChecks(context.userId, data.candidateId));
@@ -50,6 +41,21 @@ export const createDiscovery = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => z.object({ repositoryId: z.string().min(1).max(100), parentId: z.string().max(100).optional(), branch: z.string().min(1).max(80), title: z.string().min(1).max(160), claim: z.string().min(1).max(6000), evidenceRefs: z.array(z.string().max(100)).max(100).optional() }).parse(input))
   .handler(async ({ data, context }) => (await import("./service.server")).createDiscovery(context.userId, data));
+
+export const listExperiments = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(async ({context}) => (await import("./experiments.server")).listExperiments(context.userId));
+export const listWorkers = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(async ({context}) => (await import("./workers.server")).listWorkers(context.userId));
+export const registerWorker = createServerFn({ method: "POST" }).middleware([authMiddleware])
+  .validator((input:unknown)=>z.object({verifierId:z.string().min(1).max(120),image:z.string().min(1).max(300),publicKeyPem:z.string().min(40).max(500),requirementIds:z.array(z.string().min(1).max(80)).min(1).max(100),evidenceKind:z.enum(["deterministic_test","sandbox_run","static_analysis","independent_verifier"])}).parse(input))
+  .handler(async({context,data})=>(await import("./workers.server")).registerWorker(context.userId,data));
+export const queueVerifierJob = createServerFn({ method: "POST" }).middleware([authMiddleware])
+  .validator((input:unknown)=>z.object({workerId:z.string().min(1).max(100),candidateId:z.string().min(1).max(100),requirementId:z.string().min(1).max(80),expectedPolicyHash:z.string().regex(/^[a-f0-9]{64}$/),experimentId:z.string().min(1).max(100).optional()}).parse(input))
+  .handler(async({context,data})=>(await import("./workers.server")).queueVerifierJob(context.userId,data));
+export const freezeExperiment = createServerFn({ method: "POST" }).middleware([authMiddleware])
+  .validator((input:unknown)=>z.object({discoveryId:z.string().min(1).max(100),candidateId:z.string().min(1).max(100),expectedDiscoveryHash:z.string().regex(/^[a-f0-9]{64}$/),expectedPolicyHash:z.string().regex(/^[a-f0-9]{64}$/),protocol:experimentProtocolSchema}).parse(input))
+  .handler(async({context,data})=>(await import("./experiments.server")).freezeExperiment(context.userId,data));
+export const recordExperimentEvaluation = createServerFn({ method: "POST" }).middleware([authMiddleware])
+  .validator((input:unknown)=>z.object({experimentId:z.string().min(1).max(100),expectedHash:z.string().regex(/^[a-f0-9]{64}$/)}).parse(input))
+  .handler(async({context,data})=>(await import("./experiments.server")).recordExperimentEvaluation(context.userId,data.experimentId,data.expectedHash));
 
 export const createApiToken = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator((input: unknown) => z.object({ name: z.string().min(1).max(80), verifierPrincipalId: z.string().min(1).max(120).optional(), scopes: z.array(z.enum(["repository:read","repository:write","candidate:read","candidate:write","evidence:write","receipt:read"])).min(1).max(12).optional() }).parse(input)).handler(async ({ data, context }) => (await import("./api-keys.server")).createApiToken(context.userId, data.name, { verifierPrincipalId: data.verifierPrincipalId, scopes: data.scopes }));
 export const listApiTokens = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(async ({ context }) => (await import("./api-keys.server")).listApiTokens(context.userId));
