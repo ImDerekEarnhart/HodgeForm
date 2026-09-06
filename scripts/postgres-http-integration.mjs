@@ -94,6 +94,7 @@ try {
     HODGEFORM_SUPPORT_EMAIL: "support@example.test",
     HODGEFORM_SECURITY_EMAIL: "security@example.test",
     HODGEFORM_PRIVACY_EMAIL: "privacy@example.test",
+    HODGEFORM_ADMIN_EMAILS: "admin@example.test",
     HODGEFORM_DATA_RETENTION_DAYS: "30",
     HODGEFORM_LEGAL_REVIEWED: "true",
   };

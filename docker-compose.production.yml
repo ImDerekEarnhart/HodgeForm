@@ -63,6 +63,7 @@ services:
       HODGEFORM_SUPPORT_EMAIL: ${HODGEFORM_SUPPORT_EMAIL:?set support email}
       HODGEFORM_SECURITY_EMAIL: ${HODGEFORM_SECURITY_EMAIL:?set security email}
       HODGEFORM_PRIVACY_EMAIL: ${HODGEFORM_PRIVACY_EMAIL:?set privacy email}
+      HODGEFORM_ADMIN_EMAILS: ${HODGEFORM_ADMIN_EMAILS:?set comma-separated platform administrator emails}
       HODGEFORM_DATA_RETENTION_DAYS: ${HODGEFORM_DATA_RETENTION_DAYS:-30}
       HODGEFORM_LEGAL_REVIEWED: ${HODGEFORM_LEGAL_REVIEWED:?set true only after qualified legal review}
     volumes: ["sandbox-socket:/runtime/sandbox"]

@@ -27,6 +27,9 @@ export default createServerEntry({
     const started = Date.now();
     const url = new URL(request.url);
     try {
+      void import("@/lib/ops/analytics.server").then(({ recordPublicPageView }) => recordPublicPageView(request)).catch((error) => {
+        logEvent("warn", "analytics_record_failed", { request_id: id, error: error instanceof Error ? error.message : String(error) });
+      });
       const legalPage = publicPage(url.pathname);
       if (legalPage) {
         const response = harden(new Response(legalPage, { status: 200, headers: { "content-type": "text/html; charset=utf-8" } }), id);

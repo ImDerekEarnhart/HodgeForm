@@ -9,7 +9,7 @@ const pages = await readFile(new URL("../src/lib/ops/public-pages.server.ts", im
 const compose = await readFile(new URL("../docker-compose.production.yml", import.meta.url), "utf8");
 
 test("public launch requires operator contacts retention and legal review acknowledgement", () => {
-  for (const key of ["HODGEFORM_LEGAL_ENTITY_NAME","HODGEFORM_LEGAL_EFFECTIVE_DATE","HODGEFORM_SUPPORT_EMAIL","HODGEFORM_SECURITY_EMAIL","HODGEFORM_PRIVACY_EMAIL","HODGEFORM_DATA_RETENTION_DAYS","HODGEFORM_LEGAL_REVIEWED"]) {
+  for (const key of ["HODGEFORM_LEGAL_ENTITY_NAME","HODGEFORM_LEGAL_EFFECTIVE_DATE","HODGEFORM_SUPPORT_EMAIL","HODGEFORM_SECURITY_EMAIL","HODGEFORM_PRIVACY_EMAIL","HODGEFORM_ADMIN_EMAILS","HODGEFORM_DATA_RETENTION_DAYS","HODGEFORM_LEGAL_REVIEWED"]) {
     assert.match(config, new RegExp(key));
     assert.match(compose, new RegExp(key));
   }

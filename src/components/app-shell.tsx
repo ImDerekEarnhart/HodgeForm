@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Boxes, FileCheck2, GitBranch, LayoutDashboard, ReceiptText, ShieldCheck, LogOut, Users } from "lucide-react";
+import { Activity, Boxes, FileCheck2, GitBranch, LayoutDashboard, ReceiptText, ShieldCheck, LogOut, Users } from "lucide-react";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { signOut } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/discoveries", label: "Discoveries", icon: GitBranch },
   { to: "/receipts", label: "Receipts", icon: ReceiptText },
   { to: "/workspace", label: "Workspace", icon: Users },
+  { to: "/admin", label: "Operator", icon: Activity },
 ] as const;
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
