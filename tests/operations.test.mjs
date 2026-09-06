@@ -25,14 +25,18 @@ test("operator docs cover backup restore migrations rollback and key compromise"
 });
 
 test("invite-only beta has a guarded first-operator procedure", async () => {
-  const [script, workflow] = await Promise.all([
+  const [script, bootstrap, workflow] = await Promise.all([
     readFile(new URL("../scripts/provision-operator.mjs", import.meta.url), "utf8"),
+    readFile(new URL("../scripts/bootstrap-operator.mjs", import.meta.url), "utf8"),
     readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8"),
   ]);
   assert.match(script, /HODGEFORM_OPERATOR_PASSWORD/);
   assert.match(script, /PROVISION_OPERATOR:/);
   assert.match(script, /emailVerified[^\n]*true/);
   assert.doesNotMatch(script, /process\.argv\[[^\]]+\][^\n]*password/i);
+  assert.match(bootstrap, /HODGEFORM_BOOTSTRAP_OPERATOR_EMAIL/);
+  assert.match(bootstrap, /HODGEFORM_BOOTSTRAP_OPERATOR_PASSWORD/);
+  assert.match(bootstrap, /--idempotent/);
   assert.match(ops, /Controlled-beta operator provisioning/);
   assert.match(workflow, /operator-provisioning-smoke\.mjs/);
 });

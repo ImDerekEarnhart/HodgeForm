@@ -7,7 +7,7 @@ d74aeb392fb8a4bc0f53891d8e4366c92d6395f499d2941c6919985d32ff3415  ./.github/work
 d5f90f76c5b68ce7be5ba077813f97e1983511b8c314764537345a538c1261f4  ./.prettierrc
 d7d34d958413cad9e411783850543206ccbe07c82a6c30cc3ef89ceba47c2e63  ./CHANGELOG.md
 6d3f83da7d138cf87ab3f148dc32c018ec8422b9db21abd885bb0dc2718a5782  ./Caddyfile
-b7ab3b31b4fd15f5a96622121e718d735ba8e170837f5ef8c0ab807166d0523d  ./Dockerfile
+6a443fa652f772cde0e24a41d18ca410049a3bddcf600a06685e05e3dbd0ba6f  ./Dockerfile
 0b7c111fac155d8ded543e5fa7f46e8adc4e625887b02c7ff884c6aea6f1d559  ./PRODUCT_CONSTITUTION.md
 11c09962592e354d230526bef595ef5324e98f7f36cf5ba0291a6851fda6d256  ./README.md
 2832f23e73449d45a44efd041497f909a3794eba69b68495e72c73c5ce5195f6  ./RELEASE_STATUS.md
@@ -46,9 +46,10 @@ b853cd8d9df20672a6253904525e7a383c77d35768caedb5f913e59a845f034e  ./package-lock
 fbc87acaa2380405e89e2cd713c135ce1877a3db8179efabc483762f0527e5f9  ./package.json
 c30a4614c1f50a3ff020387b00c055c6d8809cfaacca120aa3785afb42def9a7  ./public/favicon.svg
 923030a4cdded83b0cf57c832f0fc38f1b8edc0ab0f768b53efcf9c35b8bb3d4  ./public/og.jpg
-d077e141cbc5a50635acdf736dce905a6d53c15de9617e17d0f2f7f834c85c71  ./railway.json
+72f5d48fc6cfd7de7473ccdff321b641edd7f0bae675d1ec61589c85876f1982  ./railway.json
 8c8e7053c55cc6250a519e176ac8f67985d47c98b731d95b1df704d9a4fe1255  ./scripts/admin-owner-recovery.mjs
 5073d39137ff9c1db25825e152ddacbeb79da7b542af7914827b1e1873163ca7  ./scripts/auth-http-integration.mjs
+14e6eb16c44615c64d161c40c17a6546a9ad2e2d74863e833e9a68f5d6473b60  ./scripts/bootstrap-operator.mjs
 2f9bad00b61a92ef3f4b345c21ea2cd5b1ce2cb7c6f5ee419b928185e457a8f0  ./scripts/brand-smoke.mjs
 4e7b30816ee3e3e09060ab7cbc47c5b8ee5223fe3193d57e234e8d130de2b61f  ./scripts/db-loss-readiness.mjs
 6d47c17dba0edfbea75157b87045cf27ef45954f5eb3362b7a0b243421a58c63  ./scripts/executor-container-smoke.sh
@@ -62,7 +63,7 @@ aef4a44cf529998f3812e5149454b08ca19c5bc1e94f72d9abf030b822a01f0c  ./scripts/post
 63e06891630c4e02a1dbab8d812af6859a7920b1c1fbf1e606bd55ec7ea4465e  ./scripts/postgres-http-integration.mjs
 ffce0bdf88c6ce566f3db8fdda9f45ef7d1001c03735cf797198428fccd35694  ./scripts/postgres-restore.sh
 e7592d83af5ae9681dc954248ae63c1d0788cdfeb29499f652cd175ee58b6c69  ./scripts/preview-http-smoke.mjs
-31eeea403d5ba67cd0fb59eb999b80ce2cd43fa86f290ec427fccb95d69c0975  ./scripts/provision-operator.mjs
+f1a8fd896ff5a39544293f20625e1e1dca2a2a20478c5daf097562ea0e013623  ./scripts/provision-operator.mjs
 298b9f7b555af470e8e06c82b3261312b4b5e316c8652aec808c0c93f6f5d2a2  ./scripts/security-static-scan.mjs
 2ec14f44cbba1b080ac2729c0f9a3f1163bf03316492d14c0586542a176178aa  ./scripts/trust-boundary-demo.mjs
 99734aafdfc40ef877732a3be27981e157bf71ca27c774afd058731e991c0759  ./scripts/trustbench.mjs
@@ -141,7 +142,7 @@ d919f834f57b8a4c2583a7381d4e98a82dad1798100d6f61cc6b92485290b5c1  ./tests/discov
 32f9168137b8345f8e14c3ac314c5e5aa3e95e94ea0456bd7a6a02aae4567536  ./tests/integration-contract.test.mjs
 0ab2d9d14c49e7629222d8dc38cf9f70f42aec7428a6786b27e34ab87565fb72  ./tests/key-generation.test.mjs
 986f2e3e40fc4f7bd75be848693212c0d6bd8560f89c32975cffc87bf21e15d6  ./tests/onboarding.test.mjs
-ea0f13db93f0503591870705750f438292a4ebd4c01e4e0ecbcc4d1c3b449e3f  ./tests/operations.test.mjs
+ed2b074593de5a4c85e3cccbd6cb09a3f411e20765734990c04ff46a4ad98190  ./tests/operations.test.mjs
 848d3c2efc267816508cbee4583ac3206a392f69118dc30397e7af1ce3720ecc  ./tests/policy.test.mjs
 ddb094dc38a90ad81f9f56baeb8169c57e7074dc816be32cebf7768a0d5eb23e  ./tests/product-surface.test.mjs
 fea0c61599ee817c44151cac7b43adc87529fcbddc3e521abf8fdf659d8d7a88  ./tests/public-hardening.test.mjs

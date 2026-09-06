@@ -3,8 +3,10 @@ import { hashPassword } from "better-auth/crypto";
 import { randomBytes, randomUUID } from "node:crypto";
 import pg from "pg";
 
-const email = process.argv[2]?.trim().toLowerCase();
-const name = process.argv[3]?.trim() || "HodgeForm operator";
+const idempotent = process.argv.includes("--idempotent");
+const positional = process.argv.slice(2).filter((argument) => argument !== "--idempotent");
+const email = positional[0]?.trim().toLowerCase();
+const name = positional[1]?.trim() || "HodgeForm operator";
 const password = process.env.HODGEFORM_OPERATOR_PASSWORD;
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -32,7 +34,12 @@ try {
   try {
     await client.query("BEGIN");
     const existing = await client.query(`select id from "user" where lower(email)=lower($1) for update`, [email]);
-    if (existing.rowCount) throw new Error("An account with this email already exists; use the normal password-reset or owner-recovery procedure");
+    if (existing.rowCount) {
+      if (!idempotent) throw new Error("An account with this email already exists; use the normal password-reset or owner-recovery procedure");
+      await client.query("COMMIT");
+      console.log(JSON.stringify({ status: "operator_already_provisioned", email }));
+      return;
+    }
     await client.query(
       `insert into "user"("id","name","email","emailVerified","createdAt","updatedAt") values($1,$2,$3,true,now(),now())`,
       [userId, name.slice(0, 120), email],
