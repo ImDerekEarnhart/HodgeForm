@@ -11,7 +11,7 @@ async function audit(userId: string, action: string, targetType: string, targetI
   await sql.query(`insert into platform_admin_audit(id,actor_user_id,action,target_type,target_id,metadata_json) values($1,$2,$3,$4,$5,$6::jsonb)`, [`admin_${randomUUID().replaceAll("-", "")}`, userId, action, targetType, targetId, JSON.stringify(metadata)]);
 }
 
-export async function getAdminDashboard(userId: string) {
+export async function getAdminDashboard(_userId: string) {
   const sql = await getSql();
   const [counts, traffic, visitors, signups, recentUsers, recentWorkspaces, pendingInvites, auditEvents] = await Promise.all([
     sql.query<Record<string, unknown>>(`select
